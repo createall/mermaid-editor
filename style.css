@@ -11,20 +11,20 @@ h1 {
 }
 
 .container {
-    /* display: flex; */ /* split.js가 처리하므로 주석 처리 또는 삭제 */
+    /* display: flex; */ /* Handled by split.js, so commented out or removed */
     gap: 20px;
     margin-top: 20px;
 }
 
 .split-container {
     display: flex;
-    height: calc(100vh - 150px); /* 뷰포트 높이에서 헤더 등의 높이를 뺀 값 */
+    height: calc(100vh - 150px); /* Viewport height minus header height, etc. */
 }
 
 .split {
-    /* padding: 10px; */ /* 내부 컨테이너에서 패딩을 관리하므로 제거 */
+    /* padding: 10px; */ /* Removed as padding is managed in inner container */
     box-sizing: border-box;
-    /* overflow-y: auto; */ /* 스크롤바 제거 */
+    /* overflow-y: auto; */ /* Remove scrollbar */
 }
 
 .gutter {
@@ -46,7 +46,7 @@ h1 {
     background-color: #fff;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    box-sizing: border-box; /* 패딩을 포함하여 크기 계산 */
+    box-sizing: border-box; /* Calculate size including padding */
     display: flex;
     flex-direction: column;
 }
@@ -124,8 +124,8 @@ button {
     display: flex;
     gap: 10px;
     margin-top: 10px;
-    flex-wrap: wrap; /* 버튼이 많아지면 다음 줄로 넘어가도록 설정 */
-    flex-shrink: 0; /* 버튼 그룹의 크기가 줄어들지 않도록 설정 */
+    flex-wrap: wrap; /* Wrap to next line if there are many buttons */
+    flex-shrink: 0; /* Prevent button group from shrinking */
 }
 
 #copy-url-btn {

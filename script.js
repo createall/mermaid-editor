@@ -1,18 +1,18 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // 저장된 분할 비율 가져오기 (없으면 기본값 [50, 50])
+    // Get saved split sizes (default to [50, 50] if not found)
     const savedSizes = localStorage.getItem('split-sizes');
     const initialSizes = savedSizes ? JSON.parse(savedSizes) : [50, 50];
 
-    // Split.js 초기화
+    // Initialize Split.js
     Split(['#editor-pane', '#diagram-pane'], {
         sizes: initialSizes,
         minSize: 200,
         gutterSize: 10,
         cursor: 'col-resize',
         onDragEnd: (sizes) => {
-            // 드래그가 끝날 때마다 비율 저장
+            // Save sizes on drag end
             localStorage.setItem('split-sizes', JSON.stringify(sizes));
-            // 패널 크기가 변경되면 panZoom도 리사이즈 필요
+            // Resize panZoom when panel size changes
             if (panZoomInstance) {
                 panZoomInstance.resize();
                 panZoomInstance.fit();
@@ -35,21 +35,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     const toast = document.getElementById('toast-notification');
     let panZoomInstance = null;
 
-    // 라인 넘버 업데이트 함수
+    // Function to update line numbers
     const updateLineNumbers = () => {
         const numberOfLines = mermaidInput.value.split('\n').length;
         lineNumbers.innerHTML = Array(numberOfLines).fill(0).map((_, i) => i + 1).join('<br>');
     };
 
-    // 스크롤 동기화
+    // Sync scroll
     mermaidInput.addEventListener('scroll', () => {
         lineNumbers.scrollTop = mermaidInput.scrollTop;
     });
 
-    // 입력 시 라인 넘버 업데이트
+    // Update line numbers on input
     mermaidInput.addEventListener('input', updateLineNumbers);
 
-    // 디바운스 함수: 지정된 시간 동안 추가 호출이 없으면 함수를 실행합니다.
+    // Debounce function: executes the function if there are no further calls for the specified time.
     const debounce = (func, delay) => {
         let timeoutId;
         return (...args) => {
@@ -70,21 +70,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const renderDiagram = async () => {
         try {
-            mermaidDiagram.innerHTML = ''; // 기존 다이어그램 초기화
+            mermaidDiagram.innerHTML = ''; // Clear existing diagram
             const mermaidCode = mermaidInput.value;
             const { svg } = await mermaid.render('graphDiv', mermaidCode);
             mermaidDiagram.innerHTML = svg;
 
-            // SVG Pan Zoom 초기화
+            // Initialize SVG Pan Zoom
             const svgElement = mermaidDiagram.querySelector('svg');
             if (svgElement) {
-                // 기존 인스턴스가 있다면 제거 (메모리 누수 방지)
+                // Destroy existing instance if present (prevent memory leaks)
                 if (panZoomInstance) {
                     try { panZoomInstance.destroy(); } catch(e) {}
                 }
 
-                // Mermaid SVG 스타일 조정 (PanZoom과 충돌 방지)
-                // Mermaid가 설정한 max-width를 제거하고 100%로 설정하여 컨테이너를 채우게 함
+                // Adjust Mermaid SVG style (prevent conflict with PanZoom)
+                // Remove max-width set by Mermaid and set to 100% to fill the container
                 svgElement.style.maxWidth = 'none';
                 svgElement.style.height = '100%';
                 svgElement.style.width = '100%';
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const code = urlParams.get('code');
         if (code) {
             try {
-                // Base64 디코딩 후 URI 디코딩
+                // Base64 decode then URI decode
                 const decodedCode = decodeURIComponent(atob(code));
                 mermaidInput.value = decodedCode;
                 return true;
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     copyUrlBtn.addEventListener('click', () => {
         const mermaidCode = mermaidInput.value;
-        // URI 인코딩 후 Base64 인코딩
+        // URI encode then Base64 encode
         const encodedCode = btoa(encodeURIComponent(mermaidCode));
         const url = `${window.location.origin}${window.location.pathname}?code=${encodedCode}`;
         
@@ -160,11 +160,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // 텍스트 파일 저장
+    // Save text file
     saveTxtBtn.addEventListener('click', async () => {
         const text = mermaidInput.value;
         
-        // File System Access API 지원 여부 확인
+        // Check if File System Access API is supported
         if ('showSaveFilePicker' in window) {
             try {
                 const handle = await window.showSaveFilePicker({
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
         } else {
-            // Fallback: 기존 다운로드 방식
+            // Fallback: Traditional download method
             const blob = new Blob([text], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -199,12 +199,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // 텍스트 파일 불러오기 버튼 클릭
+    // Click load text file button
     loadTxtBtn.addEventListener('click', () => {
         loadTxtInput.click();
     });
 
-    // 파일 선택 시 처리
+    // Handle file selection
     loadTxtInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -214,11 +214,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const content = e.target.result;
             mermaidInput.value = content;
             
-            // 라인 넘버 업데이트 및 렌더링
+            // Update line numbers and render
             updateLineNumbers();
             renderDiagram();
             
-            // 자동 저장 업데이트
+            // Update auto-save
             const data = {
                 code: content,
                 timestamp: Date.now()
@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
         reader.readAsText(file);
         
-        // 같은 파일을 다시 선택할 수 있도록 초기화
+        // Reset to allow selecting the same file again
         loadTxtInput.value = '';
     });
 
@@ -243,19 +243,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // 1. 크기 및 위치 계산 (원본 DOM에서 수행)
+        // 1. Calculate size and position (performed on original DOM)
         let width, height, x, y;
         const originalViewport = svgElement.querySelector('.svg-pan-zoom_viewport');
         
         if (originalViewport) {
-            // svg-pan-zoom이 적용된 경우, 내부 뷰포트의 BBox를 사용
+            // Use BBox of internal viewport if svg-pan-zoom is applied
             const bbox = originalViewport.getBBox();
             width = bbox.width;
             height = bbox.height;
             x = bbox.x;
             y = bbox.y;
         } else {
-            // svg-pan-zoom이 적용되지 않은 경우
+            // If svg-pan-zoom is not applied
             if (svgElement.viewBox && svgElement.viewBox.baseVal && svgElement.viewBox.baseVal.width > 0) {
                 width = svgElement.viewBox.baseVal.width;
                 height = svgElement.viewBox.baseVal.height;
@@ -270,17 +270,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        // 2. SVG 복제
+        // 2. Clone SVG
         const clonedSvg = svgElement.cloneNode(true);
 
-        // 3. svg-pan-zoom 변형 제거
+        // 3. Remove svg-pan-zoom transformations
         const clonedViewport = clonedSvg.querySelector('.svg-pan-zoom_viewport');
         if (clonedViewport) {
             clonedViewport.removeAttribute('transform');
             clonedViewport.removeAttribute('style');
         }
 
-        // 4. 루트 SVG 속성 재설정
+        // 4. Reset root SVG attributes
         clonedSvg.style.width = '';
         clonedSvg.style.height = '';
         clonedSvg.style.maxWidth = '';
@@ -331,10 +331,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     downloadPngBtn.addEventListener('click', () => downloadDiagram('png'));
     downloadJpgBtn.addEventListener('click', () => downloadDiagram('jpg'));
 
-    // 300ms 디바운스가 적용된 렌더링 함수
+    // Render function with 300ms debounce
     const debouncedRender = debounce(renderDiagram, 300);
 
-    // 텍스트 입력 시 자동 저장 및 디바운스된 렌더링 함수 호출
+    // Auto-save and call debounced render function on text input
     mermaidInput.addEventListener('input', () => {
         const data = {
             code: mermaidInput.value,
@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         debouncedRender();
     });
 
-    // URL 파라미터 처리 및 초기 렌더링
+    // Handle URL parameters and initial render
     const loadedFromUrl = setMermaidCodeFromUrl();
     
     if (!loadedFromUrl) {
@@ -352,7 +352,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (savedData) {
             try {
                 const parsedData = JSON.parse(savedData);
-                const oneHour = 60 * 60 * 1000; // 1시간 (밀리초)
+                const oneHour = 60 * 60 * 1000; // 1 hour (milliseconds)
 
                 if (parsedData && parsedData.timestamp && parsedData.code) {
                     if (Date.now() - parsedData.timestamp < oneHour) {
@@ -363,13 +363,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 }
             } catch (e) {
-                // 이전 형식(일반 텍스트)이거나 유효하지 않은 JSON인 경우 무시
+                // Ignore if legacy format (plain text) or invalid JSON
                 console.log('Invalid or legacy auto-save data found.');
             }
         }
     }
 
-    updateLineNumbers(); // 초기 라인 넘버 설정
+    updateLineNumbers(); // Set initial line numbers
     await renderDiagram();
 });
 
