@@ -1,6 +1,6 @@
-# Sequence Diagram Generator
+# Mermaid Editor
 
-A web-based tool for creating sequence diagrams using [Mermaid.js](https://mermaid.js.org/).
+A web-based tool for creating diagrams using [Mermaid.js](https://mermaid.js.org/).
 
 ## Features
 
@@ -13,17 +13,16 @@ A web-based tool for creating sequence diagrams using [Mermaid.js](https://merma
 - **Shareable URLs**: Generate a unique URL containing your diagram code to share with others.
 - **File Save/Load**: Save your Mermaid code as a text file (`.txt`) and load it back later to continue working.
 - **Export Options**: Download your diagrams as high-quality PNG or JPG images (maintains original resolution).
-- **Comprehensive Documentation**: Built-in help page covering all Mermaid sequence diagram syntax with live examples.
 
 ## How to Use
 
 1. Open `index.html` in your web browser (no server or build process required).
-2. Enter Mermaid sequence diagram syntax in the left editor pane.
+2. Enter Mermaid diagram syntax in the left editor pane.
 3. The diagram will appear in the right pane.
 4. Use the buttons below the editor to:
     - **Copy Share URL**: Copy a link to the current diagram to your clipboard.
     - **Download PNG/JPG**: Save the diagram as an image file.
-5. Click "Need Help?" to view the syntax guide in a new tab.
+5. Click "Need Help?" to view the official Mermaid documentation.
 
 ## Technologies Used
 
