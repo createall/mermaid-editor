@@ -34,3 +34,11 @@ A web-based tool for creating diagrams using [Mermaid.js](https://mermaid.js.org
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+
+## What's New (2025-11)
+
+- **대형 다이어그램 SVG로 자동 저장**: PNG/JPG로 저장 시 이미지 크기가 너무 크면 자동으로 SVG로 저장되며, 사용자에게 안내 메시지가 표시됩니다.
+- **Gantt 차트 todayMarker 자동 off**: Gantt 차트에서 todayMarker(오늘 표시선)가 자동으로 비활성화되어, 내보내기 시 불필요한 선이 포함되지 않습니다.
+- **창 크기 변경 시 다이어그램 리렌더링**: 브라우저 창 크기가 변경되면 다이어그램이 자동으로 다시 맞춰집니다.
+- **SVG 내보내기 개선**: 내보내는 SVG의 실제 보이는 영역만 정확히 포함되도록 개선되었습니다.
