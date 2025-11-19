@@ -13,7 +13,35 @@
     <div class="container split-container">
         <div id="editor-pane" class="split">
             <div class="editor-container">
-                <label for="mermaid-input">Mermaid Code:</label>
+                <div class="editor-header">
+                    <label for="mermaid-input">Mermaid Code:</label>
+                    <select id="sample-selector">
+                        <option value="" disabled selected>Insert Sample...</option>
+                        <option value="flowchart">Flowchart</option>
+                        <option value="sequence">Sequence Diagram</option>
+                        <option value="class">Class Diagram</option>
+                        <option value="state">State Diagram</option>
+                        <option value="er">Entity Relationship Diagram</option>
+                        <option value="journey">User Journey</option>
+                        <option value="gantt">Gantt</option>
+                        <option value="pie">Pie Chart</option>
+                        <option value="quadrant">Quadrant Chart</option>
+                        <option value="requirement">Requirement Diagram</option>
+                        <option value="git">GitGraph</option>
+                        <option value="c4">C4 Diagram</option>
+                        <option value="mindmap">Mindmaps</option>
+                        <option value="timeline">Timeline</option>
+                        <option value="zenuml">ZenUML</option>
+                        <option value="sankey">Sankey</option>
+                        <option value="xy">XY Chart</option>
+                        <option value="block">Block Diagram</option>
+                        <option value="packet">Packet</option>
+                        <option value="kanban">Kanban</option>
+                        <option value="architecture">Architecture</option>
+                        <option value="radar">Radar</option>
+                        <option value="treemap">Treemap</option>
+                    </select>
+                </div>
                 <div class="editor-wrapper">
                     <div id="line-numbers"></div>
                     <textarea id="mermaid-input" rows="15">

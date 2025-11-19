@@ -55,6 +55,31 @@ h1 {
     overflow: hidden;
 }
 
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.editor-header label {
+    margin: 0;
+    font-weight: bold;
+}
+
+#sample-selector {
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+}
+
+#sample-selector:hover {
+    border-color: #007bff;
+}
+
 .diagram-container {
     overflow: hidden; /* svg-pan-zoom handles navigation */
 }
