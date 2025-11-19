@@ -28,6 +28,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         flowchart: { 
             htmlLabels: false,
             useMaxWidth: false
+        },
+        gantt: {
+            displayMode: 'compact',
+            todayMarker: 'off'
         }
     });
 
@@ -101,10 +105,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     title A Gantt Diagram
     dateFormat  YYYY-MM-DD
     section Section
-    A task           :a1, 2014-01-01, 30d
+    todayMarker off
+    A task           :a1, 2025-11-10, 30d
     Another task     :after a1  , 20d
     section Another
-    Task in sec      :2014-01-12  , 12d
+    Task in sec      :2025-11-20  , 12d
     another task      : 24d`,
         pie: `pie title Pets adopted by volunteers
     "Dogs" : 386
@@ -189,11 +194,6 @@ document.addEventListener('DOMContentLoaded', async () => {
          : Google
     2005 : Youtube
     2006 : Twitter`,
-        zenuml: `zenuml
-    title Demo
-    Alice->John: Hello John, how are you?
-    John->Alice: Great!
-    Alice->John: See you later!`,
         sankey: `sankey-beta
 
 Agricultural 'waste',Bio-conversion,124.729
@@ -266,29 +266,23 @@ kanban
     disk1:T -- B:server
     disk2:T -- B:db`,
         radar: `---
-config:
-  radar:
-    curve: linear
+title: "Grades"
 ---
-radar
-  title "Skills"
-  "Communication" 80
-  "Problem Solving" 90
-  "Teamwork" 85
-  "Creativity" 75
-  "Technical" 95`,
-        treemap: `treemap
-    title "Sales by Region"
-    "North America"
-        "USA": 45000
-        "Canada": 15000
-    "Europe"
-        "UK": 25000
-        "Germany": 30000
-        "France": 20000
-    "Asia"
-        "Japan": 35000
-        "China": 40000`
+radar-beta
+  axis m["Math"], s["Science"], e["English"]
+  axis h["History"], g["Geography"], a["Art"]
+  curve a["Alice"]{85, 90, 80, 70, 75, 90}
+  curve b["Bob"]{70, 75, 85, 80, 90, 85}
+
+  max 100
+  min 0`,
+        treemap: `treemap-beta
+"Category A"
+    "Item A1": 10
+    "Item A2": 20
+"Category B"
+    "Item B1": 15
+    "Item B2": 25`
     };
 
     // Handle sample selection
@@ -519,6 +513,146 @@ radar
         loadTxtInput.value = '';
     });
 
+    const downloadSvg = () => {
+        const svgElement = mermaidDiagram.querySelector('svg');
+        if (!svgElement) {
+            showToast('No diagram to download.');
+            return;
+        }
+
+        console.log('=== SVG Download Debug ===');
+
+        // Clone and prepare SVG
+        const clonedSvg = svgElement.cloneNode(true);
+
+        // Remove the "today" line that extends beyond visible area (for Gantt charts)
+        const todayLine = clonedSvg.querySelector('.today line');
+        if (todayLine) {
+            const x1 = parseFloat(todayLine.getAttribute('x1'));
+            if (x1 > 10000) { // If today line is far in the future
+                console.log('Removing today line at x:', x1);
+                todayLine.parentElement.remove();
+            }
+        }
+
+        // Inject styles
+        const cssStyles = Array.from(document.styleSheets)
+            .filter(sheet => !sheet.href)
+            .flatMap(sheet => {
+                try {
+                    return Array.from(sheet.cssRules || sheet.rules)
+                        .map(rule => rule.cssText)
+                        .filter(cssText => !/url\s*\((?!['"]?(?:data:|#))/i.test(cssText));
+                } catch (e) {
+                    console.warn('Cannot access stylesheet:', e);
+                    return [];
+                }
+            })
+            .join('\n');
+        
+        const styleElement = document.createElement('style');
+        styleElement.textContent = cssStyles;
+        clonedSvg.insertBefore(styleElement, clonedSvg.firstChild);
+
+        // Get dimensions from ORIGINAL SVG first (before any modifications)
+        const originalViewport = svgElement.querySelector('.svg-pan-zoom_viewport');
+        let bbox;
+        
+        try {
+            // Always get BBox from original SVG to ensure correct dimensions
+            bbox = originalViewport ? originalViewport.getBBox() : svgElement.getBBox();
+            console.log('Got BBox from original SVG:', bbox);
+        } catch (e) {
+            console.warn('getBBox failed, using viewBox:', e);
+            if (svgElement.viewBox && svgElement.viewBox.baseVal && svgElement.viewBox.baseVal.width > 0) {
+                bbox = svgElement.viewBox.baseVal;
+            } else {
+                console.error('Cannot determine SVG dimensions');
+                showToast('Failed to get diagram dimensions.');
+                return;
+            }
+        }
+        
+        let { width, height, x, y } = bbox;
+        
+        // Check if this is a Gantt chart with "today" line that's too far
+        const todayLineInOriginal = svgElement.querySelector('.today line');
+        if (todayLineInOriginal) {
+            const x1 = parseFloat(todayLineInOriginal.getAttribute('x1'));
+            if (x1 > 10000) {
+                // Recalculate dimensions excluding the today line
+                console.log('Today line detected at x:', x1, '- will exclude from dimensions');
+                // Use reasonable bounds instead of the extreme today line
+                width = Math.min(width, 2000); // Cap at reasonable width
+            }
+        }
+
+        // Remove svg-pan-zoom transformations from cloned SVG
+        const clonedViewport = clonedSvg.querySelector('.svg-pan-zoom_viewport');
+        if (clonedViewport) {
+            clonedViewport.removeAttribute('transform');
+            clonedViewport.removeAttribute('style');
+            console.log('Viewport transform removed');
+        }
+        
+        // Add some padding
+        const PADDING = 20;
+        width += PADDING * 2;
+        height += PADDING * 2;
+        x -= PADDING;
+        y -= PADDING;
+        
+        console.log('SVG dimensions (after removing today line):', { width, height, x, y });
+
+        if (width <= 0 || height <= 0) {
+            console.error('Invalid SVG dimensions:', { width, height });
+            showToast('Invalid diagram dimensions.');
+            return;
+        }
+
+        // Set SVG attributes to ensure it's visible
+        clonedSvg.removeAttribute('style');
+        clonedSvg.setAttribute('width', width);
+        clonedSvg.setAttribute('height', height);
+        clonedSvg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
+        
+        // Add XML namespace if not present
+        if (!clonedSvg.hasAttribute('xmlns')) {
+            clonedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        }
+        if (!clonedSvg.hasAttribute('xmlns:xlink')) {
+            clonedSvg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+        }
+
+        // Serialize and download
+        const svgXML = new XMLSerializer().serializeToString(clonedSvg);
+        
+        console.log('SVG XML length:', svgXML.length);
+        console.log('SVG dimensions set to:', `${width}x${height}`);
+        console.log('ViewBox:', `${x} ${y} ${width} ${height}`);
+        
+        // Add XML declaration
+        const fullSvgXML = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' + svgXML;
+        
+        const blob = new Blob([fullSvgXML], { type: 'image/svg+xml;charset=utf-8' });
+        console.log('Blob size:', blob.size, 'bytes');
+        
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.download = 'diagram.svg';
+        link.href = url;
+        link.click();
+        
+        setTimeout(() => {
+            URL.revokeObjectURL(url);
+        }, 100);
+        
+        console.log('SVG download completed');
+        console.log('========================');
+        showToast('SVG downloaded successfully!');
+    };
+
     const downloadDiagram = (format) => {
         const svgElement = mermaidDiagram.querySelector('svg');
         if (!svgElement) {
@@ -526,8 +660,11 @@ radar
             return;
         }
 
-        // 1. Calculate size and position (performed on original DOM)
-        let width, height, x, y;
+        const PADDING = 20;
+        const LOAD_TIMEOUT = 10000;
+        const MAX_DIMENSION = 16384; // Browser canvas size limit
+
+        // 1. Calculate size and position
         const originalViewport = svgElement.querySelector('.svg-pan-zoom_viewport');
         
         console.log('SVG element info:', {
@@ -538,63 +675,39 @@ radar
         });
         
         // Get the actual content size
-        if (originalViewport) {
-            // Use the viewport's complete bounding box to include all content (titles, labels, etc.)
-            const bbox = originalViewport.getBBox();
-            width = bbox.width;
-            height = bbox.height;
-            x = bbox.x;
-            y = bbox.y;
-            console.log('Using complete viewport BBox (includes all content):', { x, y, width, height });
-        } else {
-            // If svg-pan-zoom is not applied
-            if (svgElement.viewBox && svgElement.viewBox.baseVal && svgElement.viewBox.baseVal.width > 0) {
-                width = svgElement.viewBox.baseVal.width;
-                height = svgElement.viewBox.baseVal.height;
-                x = svgElement.viewBox.baseVal.x;
-                y = svgElement.viewBox.baseVal.y;
-            } else {
-                const bbox = svgElement.getBBox();
-                width = bbox.width;
-                height = bbox.height;
-                x = bbox.x;
-                y = bbox.y;
-            }
+        const bbox = originalViewport ? originalViewport.getBBox() : 
+                     (svgElement.viewBox?.baseVal?.width > 0 ? svgElement.viewBox.baseVal : svgElement.getBBox());
+        
+        const { width, height, x, y } = bbox;
+        console.log('Using BBox:', { x, y, width, height });
+
+        // Check if dimensions exceed browser limits
+        if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+            console.warn('Diagram too large for PNG/JPG export. Falling back to SVG.');
+            showToast('다이어그램 크기가 너무 커 SVG로 다운로드합니다.');
+            downloadSvg();
+            return;
         }
 
-        // 2. Clone SVG
+        // 2. Clone and prepare SVG
         const clonedSvg = svgElement.cloneNode(true);
 
-        // 3. Inject all styles into the cloned SVG to ensure proper rendering
-        const styleElement = document.createElement('style');
-        let cssStyles = '';
-        
-        // Collect styles from all stylesheets
-        for (let i = 0; i < document.styleSheets.length; i++) {
-            const sheet = document.styleSheets[i];
-            
-            // Skip external stylesheets to avoid CORS issues
-            if (sheet.href) continue;
-
-            try {
-                const rules = sheet.cssRules || sheet.rules;
-                if (rules) {
-                    for (let j = 0; j < rules.length; j++) {
-                        const cssText = rules[j].cssText;
-                        
-                        // Filter out rules with external URLs (not data URIs or internal references)
-                        if (/url\s*\((?!['"]?(?:data:|#))/i.test(cssText)) {
-                            continue;
-                        }
-                        
-                        cssStyles += cssText + '\n';
-                    }
+        // 3. Inject styles
+        const cssStyles = Array.from(document.styleSheets)
+            .filter(sheet => !sheet.href)
+            .flatMap(sheet => {
+                try {
+                    return Array.from(sheet.cssRules || sheet.rules)
+                        .map(rule => rule.cssText)
+                        .filter(cssText => !/url\s*\((?!['"]?(?:data:|#))/i.test(cssText));
+                } catch (e) {
+                    console.warn('Cannot access stylesheet:', e);
+                    return [];
                 }
-            } catch (e) {
-                console.warn('Cannot access stylesheet:', e);
-            }
-        }
+            })
+            .join('\n');
         
+        const styleElement = document.createElement('style');
         styleElement.textContent = cssStyles;
         clonedSvg.insertBefore(styleElement, clonedSvg.firstChild);
 
@@ -605,63 +718,62 @@ radar
             clonedViewport.removeAttribute('style');
         }
 
-        // 5. Use original content size for export (no scaling)
-        let exportWidth = width;
-        let exportHeight = height;
-        
-        console.log('Using original content size for export:', { 
-            exportWidth, 
-            exportHeight,
+        console.log('Export size:', { 
+            width, 
+            height,
             aspectRatio: (width / height).toFixed(2)
         });
         
-        // 6. Reset root SVG attributes with original dimensions
-        clonedSvg.style.width = '';
-        clonedSvg.style.height = '';
-        clonedSvg.style.maxWidth = '';
-        
-        clonedSvg.setAttribute('width', exportWidth);
-        clonedSvg.setAttribute('height', exportHeight);
+        // 5. Set SVG attributes
+        Object.assign(clonedSvg.style, { width: '', height: '', maxWidth: '' });
+        clonedSvg.setAttribute('width', width);
+        clonedSvg.setAttribute('height', height);
         clonedSvg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
 
-        const svgXML = new XMLSerializer().serializeToString(clonedSvg);
+        // 6. Serialize and encode
+        const svgXML = new XMLSerializer().serializeToString(clonedSvg).replace(/\0/g, '');
         
-        // Clean up the SVG XML to ensure compatibility
-        // Remove any null characters or invalid XML
-        const cleanedSvgXML = svgXML.replace(/\0/g, '');
-        
-        // Use a different approach: convert SVG to data URL directly
         let svgDataUrl;
         try {
-            svgDataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(cleanedSvgXML)));
+            svgDataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgXML)));
         } catch (e) {
             console.error('SVG encoding error:', e);
             showToast('Failed to encode diagram. Please try a different diagram type.');
             return;
         }
 
+        // 7. Convert to image
         const img = new Image();
-        // IMPORTANT: Set crossOrigin before setting src to avoid tainted canvas
         img.crossOrigin = 'anonymous';
         
+        const loadTimeout = setTimeout(() => {
+            console.error('Image loading timeout');
+            showToast('Image loading timeout. Please try a simpler diagram.');
+        }, LOAD_TIMEOUT);
+        
         img.onload = () => {
+            clearTimeout(loadTimeout);
+            
             try {
-                const padding = 20;
-
                 console.log('Image loaded successfully!');
                 console.log('Image natural dimensions:', img.naturalWidth, 'x', img.naturalHeight);
-                console.log('Expected dimensions:', exportWidth, 'x', exportHeight);
+                console.log('Expected dimensions:', width, 'x', height);
 
-                // Verify dimensions are valid
-                if (exportWidth <= 0 || exportHeight <= 0) {
-                    console.error('Invalid dimensions:', { exportWidth, exportHeight });
+                if (width <= 0 || height <= 0) {
+                    console.error('Invalid dimensions:', { width, height });
                     showToast('Invalid diagram dimensions. Please try regenerating the diagram.');
                     return;
                 }
 
+                if (!img.complete || img.naturalWidth === 0) {
+                    console.error('Image not fully loaded:', { complete: img.complete, naturalWidth: img.naturalWidth });
+                    showToast('Image not fully loaded. Please try again.');
+                    return;
+                }
+
                 const canvas = document.createElement('canvas');
-                canvas.width = exportWidth + padding * 2;
-                canvas.height = exportHeight + padding * 2;
+                canvas.width = width + PADDING * 2;
+                canvas.height = height + PADDING * 2;
 
                 console.log('Canvas created with size:', canvas.width, 'x', canvas.height);
 
@@ -672,21 +784,12 @@ radar
                     return;
                 }
                 
-                // Fill with white background
                 ctx.fillStyle = 'white';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 console.log('White background filled');
                 
-                // Verify image has loaded properly
-                if (!img.complete || img.naturalWidth === 0) {
-                    console.error('Image not fully loaded:', { complete: img.complete, naturalWidth: img.naturalWidth });
-                    showToast('Image not fully loaded. Please try again.');
-                    return;
-                }
-                
-                // Draw the image
-                console.log('Drawing image at:', padding, padding, 'with size:', exportWidth, exportHeight);
-                ctx.drawImage(img, padding, padding, exportWidth, exportHeight);
+                console.log('Drawing image at:', PADDING, PADDING, 'with size:', width, height);
+                ctx.drawImage(img, PADDING, PADDING, width, height);
                 console.log('Image drawn successfully');
 
                 const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
@@ -699,7 +802,6 @@ radar
                     return;
                 }
                 
-                // Verify that dataUrl is valid before downloading
                 if (!dataUrl || dataUrl === 'data:,' || dataUrl.length < 100) {
                     console.error('Generated data URL is empty or invalid');
                     console.log('Canvas size:', canvas.width, 'x', canvas.height);
@@ -712,34 +814,20 @@ radar
                 const link = document.createElement('a');
                 link.download = `diagram.${format}`;
                 link.href = dataUrl;
-                document.body.appendChild(link);
                 link.click();
-                document.body.removeChild(link);
             } catch (e) {
                 console.error('이미지 변환 오류:', e);
                 showToast('Failed to export image. Some diagram features may not be compatible.');
             }
-
         };
+        
         img.onerror = (e) => {
+            clearTimeout(loadTimeout);
             console.error('이미지 로드 오류:', e);
             console.log('SVG Data URL length:', svgDataUrl ? svgDataUrl.length : 0);
-            console.log('SVG XML preview:', cleanedSvgXML.substring(0, 500));
+            console.log('SVG XML preview:', svgXML.substring(0, 500));
             showToast('Failed to load image. The SVG may contain unsupported features.');
         };
-        
-        // Add a timeout to detect if image loading hangs
-        const loadTimeout = setTimeout(() => {
-            console.error('Image loading timeout');
-            showToast('Image loading timeout. Please try a simpler diagram.');
-        }, 10000); // 10 second timeout
-        
-        img.onload = ((originalOnload) => {
-            return function() {
-                clearTimeout(loadTimeout);
-                originalOnload.call(this);
-            };
-        })(img.onload);
         
         img.src = svgDataUrl;
     };
@@ -787,6 +875,20 @@ radar
 
     updateLineNumbers(); // Set initial line numbers
     await renderDiagram();
+
+    // Handle window resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        // Debounce resize event to avoid too many re-renders
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            if (panZoomInstance) {
+                panZoomInstance.resize();
+                panZoomInstance.fit();
+                panZoomInstance.center();
+            }
+        }, 300);
+    });
 });
 
 
