@@ -307,12 +307,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     const downloadJpgBtn = document.getElementById('download-jpg-btn');
     const toggleBackgroundBtn = document.getElementById('toggle-background-btn');
     const mermaidInput = document.getElementById('mermaid-input');
-    const lineNumbers = document.getElementById('line-numbers');
     const mermaidDiagram = document.getElementById('mermaid-diagram');
     const toast = document.getElementById('toast-notification');
     const sampleSelector = document.getElementById('sample-selector');
+    const themeSelector = document.getElementById('theme-selector');
     let panZoomInstance = null;
     let currentBackground = localStorage.getItem(CONFIG.BACKGROUND_PATTERN_KEY) || 'dot';
+    let currentTheme = localStorage.getItem('editorTheme') || 'material-darker';
+
+    // Initialize CodeMirror
+    const editor = CodeMirror(document.querySelector('.editor-wrapper'), {
+        value: mermaidInput.value,
+        mode: 'yaml',
+        theme: currentTheme,
+        lineNumbers: true,
+        lineWrapping: true,
+        indentUnit: 4,
+        tabSize: 4,
+        indentWithTabs: false,
+        autofocus: true,
+        styleActiveLine: {nonEmpty: true},
+        matchBrackets: true
+    });
 
     // Sample codes for different diagram types
     const samples = {
@@ -551,32 +567,33 @@ radar-beta
     "Item B2": 25`
     };
 
+    // Theme selector initialization and change event
+    themeSelector.value = currentTheme;
+    themeSelector.addEventListener('change', function() {
+        const newTheme = this.value;
+        editor.setOption('theme', newTheme);
+        localStorage.setItem('editorTheme', newTheme);
+        currentTheme = newTheme;
+    });
+
     // Handle sample selection
     sampleSelector.addEventListener('change', (e) => {
         const selectedType = e.target.value;
         if (selectedType && samples[selectedType]) {
-            mermaidInput.value = samples[selectedType];
-            updateLineNumbers();
+            editor.setValue(samples[selectedType]);
             renderDiagram();
-            
-            // Keep the selector showing the selected value instead of resetting
-            // e.target.value = "";  // Removed this line
         }
     });
 
-    // Function to update line numbers
-    const updateLineNumbers = () => {
-        const numberOfLines = mermaidInput.value.split('\n').length;
-        lineNumbers.innerHTML = Array(numberOfLines).fill(0).map((_, i) => i + 1).join('<br>');
-    };
-
-    // Sync scroll
-    mermaidInput.addEventListener('scroll', () => {
-        lineNumbers.scrollTop = mermaidInput.scrollTop;
+    // CodeMirror handles its own change events
+    editor.on('change', () => {
+        const data = {
+            code: editor.getValue(),
+            timestamp: Date.now()
+        };
+        localStorage.setItem(CONFIG.MERMAID_CODE_KEY, JSON.stringify(data));
+        debouncedRender();
     });
-
-    // Update line numbers on input
-    mermaidInput.addEventListener('input', updateLineNumbers);
 
     const showToast = (message) => {
         toast.textContent = message;
@@ -589,7 +606,7 @@ radar-beta
     const renderDiagram = async () => {
         try {
             mermaidDiagram.innerHTML = ''; // Clear existing diagram
-            const mermaidCode = mermaidInput.value;
+            const mermaidCode = editor.getValue();
             const { svg } = await mermaid.render('graphDiv', mermaidCode);
             mermaidDiagram.innerHTML = svg;
 
@@ -647,7 +664,7 @@ radar-beta
             try {
                 // Base64 decode then URI decode
                 const decodedCode = decodeURIComponent(atob(code));
-                mermaidInput.value = decodedCode;
+                editor.setValue(decodedCode);
                 return true;
             } catch (e) {
                 console.error('URL parameter decoding error:', e);
@@ -658,7 +675,7 @@ radar-beta
     };
 
     copyUrlBtn.addEventListener('click', () => {
-        const mermaidCode = mermaidInput.value;
+        const mermaidCode = editor.getValue();
         // URI encode then Base64 encode
         const encodedCode = btoa(encodeURIComponent(mermaidCode));
         const url = `${window.location.origin}${window.location.pathname}?code=${encodedCode}`;
@@ -673,7 +690,7 @@ radar-beta
 
     // Save text file
     saveTxtBtn.addEventListener('click', async () => {
-        const text = mermaidInput.value;
+        const text = editor.getValue();
         
         try {
             const saved = await saveFile(text, 'mermaid-diagram.txt', 'text/plain');
@@ -699,10 +716,9 @@ radar-beta
         const reader = new FileReader();
         reader.onload = (e) => {
             const content = e.target.result;
-            mermaidInput.value = content;
+            editor.setValue(content);
             
-            // Update line numbers and render
-            updateLineNumbers();
+            // Render diagram
             renderDiagram();
             
             // Update auto-save
@@ -790,16 +806,6 @@ radar-beta
     // Apply saved background pattern
     applyBackground(currentBackground);
 
-    // Auto-save and call debounced render function on text input
-    mermaidInput.addEventListener('input', () => {
-        const data = {
-            code: mermaidInput.value,
-            timestamp: Date.now()
-        };
-        localStorage.setItem(CONFIG.MERMAID_CODE_KEY, JSON.stringify(data));
-        debouncedRender();
-    });
-
     // Handle URL parameters and initial render
     const loadedFromUrl = setMermaidCodeFromUrl();
     
@@ -812,7 +818,7 @@ radar-beta
 
                 if (parsedData && parsedData.timestamp && parsedData.code) {
                     if (Date.now() - parsedData.timestamp < oneHour) {
-                        mermaidInput.value = parsedData.code;
+                        editor.setValue(parsedData.code);
                     } else {
                         console.log('Auto-saved code expired.');
                         localStorage.removeItem(CONFIG.MERMAID_CODE_KEY);
@@ -825,7 +831,6 @@ radar-beta
         }
     }
 
-    updateLineNumbers(); // Set initial line numbers
     await renderDiagram();
 
     // Handle window resize

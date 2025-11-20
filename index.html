@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mermaid Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/nord.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/solarized.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/eclipse.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/idea.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/ambiance.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -40,9 +49,21 @@
         <div id="editor-pane" class="split">
             <div class="editor-container">
                 <div class="editor-header">
-                    <label for="mermaid-input">Mermaid Code:</label>
-                    <select id="sample-selector">
-                        <option value="" disabled selected>Insert Sample...</option>
+                    <label for="mermaid-input">Code:</label>
+                    <div class="header-controls">
+                        <select id="theme-selector">
+                            <option value="material-darker">Material Darker</option>
+                            <option value="monokai">Monokai</option>
+                            <option value="dracula">Dracula</option>
+                            <option value="nord">Nord</option>
+                            <option value="solarized dark">Solarized Dark</option>
+                            <option value="solarized light">Solarized Light</option>
+                            <option value="eclipse">Eclipse</option>
+                            <option value="idea">IntelliJ IDEA</option>
+                            <option value="ambiance">Ambiance</option>
+                        </select>
+                        <select id="sample-selector">
+                            <option value="" disabled selected>Insert Sample...</option>
                         <option value="flowchart">Flowchart</option>
                         <option value="sequence">Sequence Diagram</option>
                         <option value="class">Class Diagram</option>
@@ -66,10 +87,10 @@
                         <option value="radar">Radar</option>
                         <option value="treemap">Treemap</option>
                     </select>
+                    </div>
                 </div>
                 <div class="editor-wrapper">
-                    <div id="line-numbers"></div>
-                    <textarea id="mermaid-input" rows="15">
+                    <textarea id="mermaid-input" style="display:none;">
 ---
 title: Hello Sequence
 ---
@@ -144,6 +165,9 @@ sequenceDiagram
     <script src="https://unpkg.com/split.js/dist/split.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/yaml/yaml.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

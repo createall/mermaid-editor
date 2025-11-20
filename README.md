@@ -4,9 +4,16 @@ A modern, web-based tool for creating beautiful diagrams using [Mermaid.js](http
 
 ## ✨ Features
 
+### Code Editor
+- **Syntax Highlighting**: Professional code editor with YAML syntax highlighting for Mermaid frontmatter
+- **Multiple Themes**: Choose from 9 editor themes (Material Darker, Monokai, Dracula, Nord, Solarized, Eclipse, IntelliJ IDEA, Ambiance)
+- **Active Line Highlighting**: Visual indicator for the current line (adapts to theme brightness)
+- **Line Numbers**: Built-in line numbering with smart bracket matching
+- **Auto-indent**: Intelligent code formatting and indentation
+- **Theme Persistence**: Selected editor theme saved to localStorage
+
 ### Editor & Preview
 - **Real-time Rendering**: Diagrams update automatically as you type
-- **Enhanced Editor**: Code editor with line numbers for better readability
 - **Split View**: Adjustable resizable panels between code and preview (layout saved automatically)
 - **Zoom & Pan**: Navigate large diagrams with mouse controls or zoom buttons
 - **Background Patterns**: Toggle between dot and grid patterns for better visualization
@@ -70,8 +77,10 @@ For more syntax details, visit the [official Mermaid documentation](https://merm
 - **Core**: HTML5, CSS3, Vanilla JavaScript
 - **Libraries**:
   - [Mermaid.js](https://mermaid.js.org/) v11+ - Diagram rendering
+  - [CodeMirror](https://codemirror.net/) 5.65.16 - Professional code editor with syntax highlighting
   - [Split.js](https://split.js.org/) 1.6.5 - Resizable panels
   - [svg-pan-zoom](https://github.com/ariutta/svg-pan-zoom) 3.6.1 - SVG interaction
+- **CDN**: Cloudflare, jsDelivr, unpkg
 
 ## 📂 Project Structure
 

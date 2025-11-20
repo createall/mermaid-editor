@@ -178,6 +178,12 @@ body {
     font-weight: bold;
 }
 
+.header-controls {
+    display: flex;
+    gap: 10px;
+}
+
+#theme-selector,
 #sample-selector {
     padding: 6px 10px;
     border-radius: 4px;
@@ -187,6 +193,7 @@ body {
     cursor: pointer;
 }
 
+#theme-selector:hover,
 #sample-selector:hover {
     border-color: #007bff;
 }
@@ -212,26 +219,59 @@ body {
 .editor-wrapper {
     display: flex;
     flex-grow: 1;
+    flex: 1;
     border: 1px solid #ccc;
     border-radius: 4px;
     overflow: hidden;
     margin-bottom: 10px; /* Space before buttons */
+    height: 100%;
 }
 
-#line-numbers {
-    width: 40px;
-    background-color: #f5f5f5;
-    border-right: 1px solid #ddd;
-    text-align: right;
-    padding: 10px 5px;
+/* CodeMirror custom styles */
+.CodeMirror {
+    height: 100%;
+    width: 100%;
     font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
     font-size: 14px;
-    line-height: 1.5;
-    color: #999;
-    overflow: hidden;
-    box-sizing: border-box;
-    user-select: none;
 }
+
+.CodeMirror-gutters {
+    background-color: #263238;
+    border-right: 1px solid #37474f;
+}
+
+/* Active line styling - Dark themes */
+.cm-s-material-darker div.CodeMirror-activeline-background,
+.cm-s-monokai div.CodeMirror-activeline-background,
+.cm-s-dracula div.CodeMirror-activeline-background,
+.cm-s-nord div.CodeMirror-activeline-background,
+.cm-s-ambiance div.CodeMirror-activeline-background,
+.cm-s-solarized.cm-s-dark div.CodeMirror-activeline-background {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.cm-s-material-darker .CodeMirror-activeline .CodeMirror-gutter-elt,
+.cm-s-monokai .CodeMirror-activeline .CodeMirror-gutter-elt,
+.cm-s-dracula .CodeMirror-activeline .CodeMirror-gutter-elt,
+.cm-s-nord .CodeMirror-activeline .CodeMirror-gutter-elt,
+.cm-s-ambiance .CodeMirror-activeline .CodeMirror-gutter-elt,
+.cm-s-solarized.cm-s-dark .CodeMirror-activeline .CodeMirror-gutter-elt {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Active line styling - Light themes */
+.cm-s-eclipse div.CodeMirror-activeline-background,
+.cm-s-idea div.CodeMirror-activeline-background,
+.cm-s-solarized.cm-s-light div.CodeMirror-activeline-background {
+    background: rgba(0, 0, 0, 0.08) !important;
+}
+
+.cm-s-eclipse .CodeMirror-activeline .CodeMirror-gutter-elt,
+.cm-s-idea .CodeMirror-activeline .CodeMirror-gutter-elt,
+.cm-s-solarized.cm-s-light .CodeMirror-activeline .CodeMirror-gutter-elt {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
 
 textarea {
     width: 100%;
