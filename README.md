@@ -2,6 +2,8 @@
 
 A modern, web-based tool for creating beautiful diagrams using [Mermaid.js](https://mermaid.js.org/).
 
+🚀 **[Try it now!](https://swkwon.github.io/mermaid-editor/)**
+
 ## ✨ Features
 
 ### Code Editor
@@ -45,31 +47,6 @@ A modern, web-based tool for creating beautiful diagrams using [Mermaid.js](http
    - **Save/Load**: Export or import diagram code
    - **Export**: Download as PNG or JPG image
    - **Background**: Toggle between dot/grid patterns
-
-## 📚 Mermaid Syntax
-
-### Basic Example
-```mermaid
-graph TD
-    A[Start] --> B{Decision}
-    B -->|Yes| C[OK]
-    B -->|No| D[End]
-```
-
-### With Frontmatter (Theme & Config)
-```mermaid
----
-title: My Diagram
-config:
-  theme: forest
-  themeVariables:
-    primaryColor: "#00ff00"
----
-flowchart TD
-    A --> B
-```
-
-**Available Themes**: `default`, `forest`, `dark`, `neutral`, `base`
 
 For more syntax details, visit the [official Mermaid documentation](https://mermaid.js.org/syntax/flowchart.html).
 
