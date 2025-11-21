@@ -354,6 +354,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const toast = document.getElementById('toast-notification');
     const sampleSelector = document.getElementById('sample-selector');
     const themeSelector = document.getElementById('theme-selector');
+    const sponsorBtn = document.getElementById('sponsor-btn');
+    const sponsorModal = document.getElementById('sponsor-modal');
+    const closeModal = document.getElementById('close-modal');
     let panZoomInstance = null;
 
     // Initialize CodeMirror
@@ -1231,6 +1234,29 @@ radar-beta
     }
 
     await renderDiagram();
+
+    // Sponsor modal handlers
+    sponsorBtn.addEventListener('click', () => {
+        sponsorModal.classList.add('show');
+    });
+
+    closeModal.addEventListener('click', () => {
+        sponsorModal.classList.remove('show');
+    });
+
+    // Close modal when clicking outside
+    sponsorModal.addEventListener('click', (e) => {
+        if (e.target === sponsorModal) {
+            sponsorModal.classList.remove('show');
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sponsorModal.classList.contains('show')) {
+            sponsorModal.classList.remove('show');
+        }
+    });
 });
 
 
