@@ -5,7 +5,6 @@ const CONFIG = {
     BACKGROUND_PATTERN_KEY: 'background-pattern',
     AUTOSAVE_TTL: 60 * 60 * 1000, // 1 hour
     DEBOUNCE_DELAY: 300,
-    RESIZE_DEBOUNCE: 300,
     TOAST_DURATION: 3000,
     PADDING: 20,
     LOAD_TIMEOUT: 10000,
@@ -278,11 +277,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         cursor: 'col-resize',
         onDragEnd: (sizes) => {
             localStorage.setItem(CONFIG.SPLIT_SIZES_KEY, JSON.stringify(sizes));
-            if (panZoomInstance) {
-                panZoomInstance.resize();
-                panZoomInstance.fit();
-                panZoomInstance.center();
-            }
         }
     });
 
@@ -659,12 +653,24 @@ radar-beta
 
                 panZoomInstance = svgPanZoom(svgElement, {
                     zoomEnabled: true,
-                    controlIconsEnabled: true,
+                    controlIconsEnabled: false,
                     fit: true,
                     center: true,
                     minZoom: 0.5,
-                    maxZoom: 10
+                    maxZoom: 10,
+                    onZoom: function(newZoom) {
+                        const zoomLevelEl = document.getElementById('zoom-level');
+                        if (zoomLevelEl) {
+                            zoomLevelEl.textContent = `${Math.round(newZoom * 100)}%`;
+                        }
+                    }
                 });
+                
+                // Initial zoom level display
+                const zoomLevelEl = document.getElementById('zoom-level');
+                if (zoomLevelEl) {
+                    zoomLevelEl.textContent = `${Math.round(panZoomInstance.getZoom() * 100)}%`;
+                }
             }
         } catch (e) {
             // parse 실패 또는 render 실패 시 차트 유지
@@ -866,6 +872,58 @@ radar-beta
     downloadPngBtn.addEventListener('click', () => downloadDiagram('png'));
     downloadJpgBtn.addEventListener('click', () => downloadDiagram('jpg'));
 
+    // SVG download
+    const downloadSvgBtn = document.getElementById('download-svg-btn');
+    downloadSvgBtn.addEventListener('click', () => {
+        const svgElement = mermaidDiagram.querySelector('svg');
+        if (!svgElement) {
+            showToast(CONFIG.MESSAGES.NO_DIAGRAM);
+            return;
+        }
+
+        try {
+            // Clone the SVG
+            const clonedSvg = prepareSvgForExport(svgElement);
+            
+            // Get dimensions
+            const bbox = getSvgDimensions(svgElement);
+            const { width, height, x, y } = bbox;
+            
+            // Set proper attributes
+            clonedSvg.setAttribute('width', width);
+            clonedSvg.setAttribute('height', height);
+            clonedSvg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
+            
+            // Ensure proper namespaces
+            if (!clonedSvg.hasAttribute('xmlns')) {
+                clonedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            }
+            if (!clonedSvg.hasAttribute('xmlns:xlink')) {
+                clonedSvg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+            }
+
+            // Serialize to string
+            const serializer = new XMLSerializer();
+            const svgString = serializer.serializeToString(clonedSvg);
+            const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            
+            // Download
+            const url = URL.createObjectURL(svgBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'diagram.svg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            showToast('SVG downloaded successfully!');
+        } catch (error) {
+            console.error('SVG download error:', error);
+            showToast('Failed to download SVG');
+        }
+    });
+
     // Background pattern toggle
     const applyBackground = (pattern) => {
         if (pattern === 'dot') {
@@ -887,6 +945,95 @@ radar-beta
 
     // Apply saved background pattern
     applyBackground(currentBackground);
+
+    // Zoom level update function
+    const updateZoomLevel = (zoom) => {
+        const zoomLevelEl = document.getElementById('zoom-level');
+        if (zoomLevelEl) {
+            zoomLevelEl.textContent = `${Math.round(zoom * 100)}%`;
+        }
+    };
+
+    // Zoom controls
+    const zoomInBtn = document.getElementById('zoom-in-btn');
+    const zoomOutBtn = document.getElementById('zoom-out-btn');
+    const zoomResetBtn = document.getElementById('zoom-reset-btn');
+
+    zoomInBtn?.addEventListener('click', () => {
+        if (panZoomInstance) {
+            panZoomInstance.zoomIn();
+            updateZoomLevel(panZoomInstance.getZoom());
+        }
+    });
+
+    zoomOutBtn?.addEventListener('click', () => {
+        if (panZoomInstance) {
+            panZoomInstance.zoomOut();
+            updateZoomLevel(panZoomInstance.getZoom());
+        }
+    });
+
+    zoomResetBtn?.addEventListener('click', () => {
+        if (panZoomInstance) {
+            panZoomInstance.resetZoom();
+            panZoomInstance.resize();
+            panZoomInstance.fit();
+            panZoomInstance.center();
+            updateZoomLevel(panZoomInstance.getZoom());
+        }
+    });
+
+    // Keyboard shortcuts for zoom controls and panning
+    document.addEventListener('keydown', (e) => {
+        // Check if target is not the editor to avoid conflicts
+        if (e.target.classList.contains('CodeMirror')) return;
+        
+        if (e.ctrlKey || e.metaKey) {
+            if (e.key === '+' || e.key === '=') {
+                e.preventDefault();
+                if (panZoomInstance) {
+                    panZoomInstance.zoomIn();
+                    updateZoomLevel(panZoomInstance.getZoom());
+                }
+            } else if (e.key === '-' || e.key === '_') {
+                e.preventDefault();
+                if (panZoomInstance) {
+                    panZoomInstance.zoomOut();
+                    updateZoomLevel(panZoomInstance.getZoom());
+                }
+            } else if (e.key === '0') {
+                e.preventDefault();
+                if (panZoomInstance) {
+                    panZoomInstance.resetZoom();
+                    panZoomInstance.resize();
+                    panZoomInstance.fit();
+                    panZoomInstance.center();
+                    updateZoomLevel(panZoomInstance.getZoom());
+                }
+            } else if (e.key === 'i' || e.key === 'k' || e.key === 'j' || e.key === 'l') {
+                e.preventDefault();
+                if (panZoomInstance) {
+                    const pan = panZoomInstance.getPan();
+                    const panStep = 50; // pixels to move per key press
+                    
+                    switch (e.key) {
+                        case 'i':
+                            panZoomInstance.pan({ x: pan.x, y: pan.y - panStep });
+                            break;
+                        case 'k':
+                            panZoomInstance.pan({ x: pan.x, y: pan.y + panStep });
+                            break;
+                        case 'j':
+                            panZoomInstance.pan({ x: pan.x - panStep, y: pan.y });
+                            break;
+                        case 'l':
+                            panZoomInstance.pan({ x: pan.x + panStep, y: pan.y });
+                            break;
+                    }
+                }
+            }
+        }
+    });
 
     // Handle URL parameters and initial render
     const loadedFromUrl = setMermaidCodeFromUrl();
@@ -914,20 +1061,6 @@ radar-beta
     }
 
     await renderDiagram();
-
-    // Handle window resize
-    let resizeTimeout;
-    window.addEventListener('resize', () => {
-        // Debounce resize event to avoid too many re-renders
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => {
-            if (panZoomInstance) {
-                panZoomInstance.resize();
-                panZoomInstance.fit();
-                panZoomInstance.center();
-            }
-        }, CONFIG.RESIZE_DEBOUNCE);
-    });
 });
 
 

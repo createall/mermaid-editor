@@ -193,8 +193,28 @@ body {
 
 .diagram-header {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 10px;
+}
+
+/* Zoom Controls */
+.zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.zoom-level {
+    min-width: 50px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    padding: 4px 8px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    user-select: none;
 }
 
 #mermaid-diagram {
@@ -366,6 +386,15 @@ textarea {
 
 .btn-warning:hover {
     background: linear-gradient(135deg, #e0a800 0%, #d39e00 100%);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #7c8ff0 0%, #8a5bb5 100%);
 }
 
 /* Responsive Design */
