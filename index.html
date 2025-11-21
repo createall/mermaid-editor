@@ -131,25 +131,23 @@ sequenceDiagram
                         </button>
                         <input type="file" id="load-txt-input" accept=".txt,.mmd" style="display: none;">
                     </div>
-                    <div class="toolbar-group">
-                        <button id="download-png-btn" class="btn btn-info" title="Export as PNG image">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M.002 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2V3zm1 9v1a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12zm5-6.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0z"/>
-                            </svg>
-                            <span>PNG</span>
-                        </button>
-                        <button id="download-jpg-btn" class="btn btn-warning" title="Export as JPG image">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M.002 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2V3zm1 9v1a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12zm5-6.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0z"/>
-                            </svg>
-                            <span>JPG</span>
-                        </button>
-                        <button id="download-svg-btn" class="btn btn-primary" title="Export as SVG image">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M.002 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2V3zm1 9v1a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12zm5-6.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0z"/>
-                            </svg>
-                            <span>SVG</span>
-                        </button>
+                    <div class="toolbar-group export-group">
+                        <div class="export-dropdown">
+                            <button id="export-btn" class="btn btn-primary" title="Export diagram" aria-haspopup="true" aria-expanded="false">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M.5 2A1.5 1.5 0 0 1 2 0h8.293A1.5 1.5 0 0 1 11.5.439l3.061 3.06A1.5 1.5 0 0 1 15 4.793V14a2 2 0 0 1-2 2H2a1.5 1.5 0 0 1-1.5-1.5V2z"/>
+                                    <path d="M8 5a.5.5 0 0 0-.5.5v3.793L6.354 8.646a.5.5 0 1 0-.708.708l2 2 .007.007a.497.497 0 0 0 .7-.007l2-2a.5.5 0 0 0-.707-.708L8.5 9.293V5.5A.5.5 0 0 0 8 5z"/>
+                                </svg>
+                                <span>Export</span>
+                                <svg class="chevron" width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 5.5l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+                            </button>
+                            <div id="export-menu" class="export-menu" role="menu" aria-hidden="true">
+                                <button class="export-item" data-format="png" role="menuitem">PNG</button>
+                                <button class="export-item" data-format="jpg" role="menuitem">JPG</button>
+                                <button class="export-item" data-format="svg" role="menuitem">SVG</button>
+                                <button class="export-item" data-format="pdf" role="menuitem">PDF</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -196,6 +194,7 @@ sequenceDiagram
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/yaml/yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

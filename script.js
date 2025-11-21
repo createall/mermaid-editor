@@ -28,7 +28,9 @@ const CONFIG = {
         EXPORT_ERROR: 'Failed to export image. Some diagram features may not be compatible.',
         IMAGE_LOAD_ERROR: 'Failed to load image. The SVG may contain unsupported features.',
         URL_DECODE_FAILED: 'Failed to load code from URL.',
-        ENCODE_FAILED: 'Failed to encode diagram. Please try a different diagram type.'
+        ENCODE_FAILED: 'Failed to encode diagram. Please try a different diagram type.',
+        PDF_SUCCESS: 'PDF downloaded successfully!',
+        PDF_FAILED: 'Failed to generate PDF.'
     }
 };
 
@@ -298,8 +300,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const saveTxtBtn = document.getElementById('save-txt-btn');
     const loadTxtBtn = document.getElementById('load-txt-btn');
     const loadTxtInput = document.getElementById('load-txt-input');
-    const downloadPngBtn = document.getElementById('download-png-btn');
-    const downloadJpgBtn = document.getElementById('download-jpg-btn');
+    const exportBtn = document.getElementById('export-btn');
+    const exportMenu = document.getElementById('export-menu');
     const toggleBackgroundBtn = document.getElementById('toggle-background-btn');
     const mermaidInput = document.getElementById('mermaid-input');
     const mermaidDiagram = document.getElementById('mermaid-diagram');
@@ -598,6 +600,48 @@ radar-beta
         }, CONFIG.TOAST_DURATION);
     };
 
+    const downloadDiagram = (format) => {
+        const svgElement = mermaidDiagram.querySelector('svg');
+        if (!svgElement) {
+            showToast(CONFIG.MESSAGES.NO_DIAGRAM);
+            return;
+        }
+
+        // Calculate size and position
+        console.log('SVG element info:', {
+            clientWidth: svgElement.clientWidth,
+            clientHeight: svgElement.clientHeight,
+            viewBox: svgElement.getAttribute('viewBox')
+        });
+        
+        const bbox = getSvgDimensions(svgElement);
+        const { width, height, x, y } = bbox;
+        console.log('Using BBox:', { x, y, width, height });
+
+        // Check if dimensions exceed browser limits
+        if (width > CONFIG.MAX_DIMENSION || height > CONFIG.MAX_DIMENSION) {
+            console.warn('Diagram dimensions exceed maximum allowed size:', { width, height });
+            showToast(CONFIG.MESSAGES.DIAGRAM_TOO_LARGE);
+            return;
+        }
+
+        // Convert SVG to image and download
+        convertSvgToImage(
+            svgElement,
+            bbox,
+            format,
+            (dataUrl) => {
+                const link = document.createElement('a');
+                link.download = `diagram.${format}`;
+                link.href = dataUrl;
+                link.click();
+            },
+            (errorMessage) => {
+                showToast(errorMessage);
+            }
+        );
+    };
+
     const renderDiagram = async () => {
         const mermaidTemp = document.getElementById('mermaid-temp');
         
@@ -827,100 +871,108 @@ radar-beta
         loadTxtInput.value = '';
     });
 
-    const downloadDiagram = (format) => {
-        const svgElement = mermaidDiagram.querySelector('svg');
-        if (!svgElement) {
-            showToast(CONFIG.MESSAGES.NO_DIAGRAM);
-            return;
+    // Unified export button toggle
+    exportBtn.addEventListener('click', () => {
+        const parent = exportBtn.closest('.export-dropdown');
+        const isOpen = parent.classList.contains('open');
+        parent.classList.toggle('open');
+        exportBtn.setAttribute('aria-expanded', String(!isOpen));
+        exportMenu.setAttribute('aria-hidden', String(isOpen));
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!exportMenu.contains(e.target) && !exportBtn.contains(e.target)) {
+            const parent = exportBtn.closest('.export-dropdown');
+            if (parent.classList.contains('open')) {
+                parent.classList.remove('open');
+                exportBtn.setAttribute('aria-expanded', 'false');
+                exportMenu.setAttribute('aria-hidden', 'true');
+            }
         }
+    });
 
-        // Calculate size and position
-        console.log('SVG element info:', {
-            clientWidth: svgElement.clientWidth,
-            clientHeight: svgElement.clientHeight,
-            viewBox: svgElement.getAttribute('viewBox')
-        });
-        
-        const bbox = getSvgDimensions(svgElement);
-        const { width, height, x, y } = bbox;
-        console.log('Using BBox:', { x, y, width, height });
+    // Export menu selection
+    exportMenu.addEventListener('click', (e) => {
+        const btn = e.target.closest('.export-item');
+        if (!btn) return;
+        const format = btn.getAttribute('data-format');
+        const parent = exportBtn.closest('.export-dropdown');
+        parent.classList.remove('open');
+        exportBtn.setAttribute('aria-expanded', 'false');
+        exportMenu.setAttribute('aria-hidden', 'true');
 
-        // Check if dimensions exceed browser limits
-        if (width > CONFIG.MAX_DIMENSION || height > CONFIG.MAX_DIMENSION) {
-            console.warn('Diagram dimensions exceed maximum allowed size:', { width, height });
-            showToast(CONFIG.MESSAGES.DIAGRAM_TOO_LARGE);
-            return;
-        }
-
-        // Convert SVG to image and download
-        convertSvgToImage(
-            svgElement,
-            bbox,
-            format,
-            (dataUrl) => {
+        if (format === 'png' || format === 'jpg') {
+            downloadDiagram(format);
+        } else if (format === 'svg') {
+            const svgElement = mermaidDiagram.querySelector('svg');
+            if (!svgElement) { showToast(CONFIG.MESSAGES.NO_DIAGRAM); return; }
+            try {
+                const clonedSvg = prepareSvgForExport(svgElement);
+                const bbox = getSvgDimensions(svgElement);
+                const { width, height, x, y } = bbox;
+                clonedSvg.setAttribute('width', width);
+                clonedSvg.setAttribute('height', height);
+                clonedSvg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
+                if (!clonedSvg.hasAttribute('xmlns')) clonedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+                if (!clonedSvg.hasAttribute('xmlns:xlink')) clonedSvg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+                const serializer = new XMLSerializer();
+                const svgString = serializer.serializeToString(clonedSvg);
+                const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(svgBlob);
                 const link = document.createElement('a');
-                link.download = `diagram.${format}`;
-                link.href = dataUrl;
+                link.href = url;
+                link.download = 'diagram.svg';
+                document.body.appendChild(link);
                 link.click();
-            },
-            (errorMessage) => {
-                showToast(errorMessage);
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                showToast('SVG downloaded successfully!');
+            } catch (error) {
+                console.error('SVG download error:', error);
+                showToast('Failed to download SVG');
             }
-        );
-    };
-
-    downloadPngBtn.addEventListener('click', () => downloadDiagram('png'));
-    downloadJpgBtn.addEventListener('click', () => downloadDiagram('jpg'));
-
-    // SVG download
-    const downloadSvgBtn = document.getElementById('download-svg-btn');
-    downloadSvgBtn.addEventListener('click', () => {
-        const svgElement = mermaidDiagram.querySelector('svg');
-        if (!svgElement) {
-            showToast(CONFIG.MESSAGES.NO_DIAGRAM);
-            return;
-        }
-
-        try {
-            // Clone the SVG
-            const clonedSvg = prepareSvgForExport(svgElement);
-            
-            // Get dimensions
-            const bbox = getSvgDimensions(svgElement);
-            const { width, height, x, y } = bbox;
-            
-            // Set proper attributes
-            clonedSvg.setAttribute('width', width);
-            clonedSvg.setAttribute('height', height);
-            clonedSvg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
-            
-            // Ensure proper namespaces
-            if (!clonedSvg.hasAttribute('xmlns')) {
-                clonedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        } else if (format === 'pdf') {
+            const svgElement = mermaidDiagram.querySelector('svg');
+            if (!svgElement) { showToast(CONFIG.MESSAGES.NO_DIAGRAM); return; }
+            try {
+                const bbox = getSvgDimensions(svgElement);
+                convertSvgToImage(
+                    svgElement,
+                    bbox,
+                    'png',
+                    (dataUrl) => {
+                        try {
+                            const { jsPDF } = window.jspdf || {};
+                            if (!jsPDF) { showToast(CONFIG.MESSAGES.PDF_FAILED); return; }
+                            const orientation = bbox.width > bbox.height ? 'landscape' : 'portrait';
+                            const pdf = new jsPDF({ orientation, unit: 'pt', format: 'a4' });
+                            const pageWidth = pdf.internal.pageSize.getWidth();
+                            const pageHeight = pdf.internal.pageSize.getHeight();
+                            const margin = 20;
+                            const imgWidth = bbox.width + CONFIG.PADDING * 2;
+                            const imgHeight = bbox.height + CONFIG.PADDING * 2;
+                            const maxWidth = pageWidth - margin * 2;
+                            const maxHeight = pageHeight - margin * 2;
+                            const scale = Math.min(maxWidth / imgWidth, maxHeight / imgHeight);
+                            const renderWidth = imgWidth * scale;
+                            const renderHeight = imgHeight * scale;
+                            const offsetX = (pageWidth - renderWidth) / 2;
+                            const offsetY = (pageHeight - renderHeight) / 2;
+                            pdf.addImage(dataUrl, 'PNG', offsetX, offsetY, renderWidth, renderHeight);
+                            pdf.save('diagram.pdf');
+                            showToast(CONFIG.MESSAGES.PDF_SUCCESS);
+                        } catch (err) {
+                            console.error('PDF generation error:', err);
+                            showToast(CONFIG.MESSAGES.PDF_FAILED);
+                        }
+                    },
+                    (errorMessage) => { console.error('Failed to convert SVG for PDF:', errorMessage); showToast(CONFIG.MESSAGES.PDF_FAILED); }
+                );
+            } catch (err) {
+                console.error('PDF export error:', err);
+                showToast(CONFIG.MESSAGES.PDF_FAILED);
             }
-            if (!clonedSvg.hasAttribute('xmlns:xlink')) {
-                clonedSvg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-            }
-
-            // Serialize to string
-            const serializer = new XMLSerializer();
-            const svgString = serializer.serializeToString(clonedSvg);
-            const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-            
-            // Download
-            const url = URL.createObjectURL(svgBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'diagram.svg';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            
-            showToast('SVG downloaded successfully!');
-        } catch (error) {
-            console.error('SVG download error:', error);
-            showToast('Failed to download SVG');
         }
     });
 
