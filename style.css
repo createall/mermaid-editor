@@ -907,19 +907,19 @@ body.dark-mode .export-item:hover {
 }
 
 .export-item[data-format="png"]::before {
-    content: "?“„";
+    content: "?ï¿½ï¿½";
 }
 
 .export-item[data-format="jpg"]::before {
-    content: "?–¼ï¸?;
+    content: "?ï¿½ï¿½ï¿½?;
 }
 
 .export-item[data-format="svg"]::before {
-    content: "?”§";
+    content: "?ï¿½ï¿½";
 }
 
 .export-item[data-format="pdf"]::before {
-    content: "?“‘";
+    content: "?ï¿½ï¿½";
 }
 
 .btn {
@@ -1077,13 +1077,13 @@ body.dark-mode .export-item:hover {
     border-bottom: none;
 }
 
-/* Mermaid ?ëŸ¬ ?”ì†Œ ?¨ê? */
+/* Mermaid ?ï¿½ëŸ¬ ?ï¿½ì†Œ ?ï¿½ï¿½? */
 .error-icon,
 .error-text {
     display: none !important;
 }
 
-/* CodeMirror ?ëŸ¬ ?¼ì¸ ?œì‹œ */
+/* CodeMirror ?ï¿½ëŸ¬ ?ï¿½ì¸ ?ï¿½ì‹œ */
 .CodeMirror .error-line {
     background-color: rgba(255, 0, 0, 0.1);
     border-bottom: 2px dotted #ff0000;
@@ -1262,13 +1262,13 @@ body.dark-mode .export-item:hover {
     border-bottom: none;
 }
 
-/* Mermaid ?ëŸ¬ ?”ì†Œ ?¨ê? */
+/* Mermaid ?ï¿½ëŸ¬ ?ï¿½ì†Œ ?ï¿½ï¿½? */
 .error-icon,
 .error-text {
     display: none !important;
 }
 
-/* CodeMirror ?ëŸ¬ ?¼ì¸ ?œì‹œ */
+/* CodeMirror ?ï¿½ëŸ¬ ?ï¿½ì¸ ?ï¿½ì‹œ */
 .CodeMirror .error-line {
     background-color: rgba(255, 0, 0, 0.1);
     border-bottom: 2px dotted #ff0000;
