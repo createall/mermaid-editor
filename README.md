@@ -24,6 +24,11 @@ A modern, web-based tool for creating beautiful diagrams using [Mermaid.js](http
   - `Ctrl + i/k/j/l`: Pan diagram in all directions
 - **Background Patterns**: Single button cycles **dot → grid → none (blank)**; selection persists via localStorage for consistent visualization
 
+### Mobile Experience
+- **Responsive Layout**: Optimized interface for mobile devices and tablets
+- **View Toggle**: Switch between Code and Preview modes on smaller screens to maximize workspace
+- **Touch-Friendly**: Larger touch targets and optimized controls for touch input
+
 ### Save & Share
 - **Auto-Save**: Automatic local storage backup (1-hour expiration)
 - **Shareable URLs**: Generate encoded URLs to share diagrams

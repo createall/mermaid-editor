@@ -65,8 +65,8 @@ const collectCssStyles = () => {
 
 const getSvgDimensions = (svgElement) => {
     const viewport = svgElement.querySelector('.svg-pan-zoom_viewport');
-    return viewport ? viewport.getBBox() : 
-           (svgElement.viewBox?.baseVal?.width > 0 ? svgElement.viewBox.baseVal : svgElement.getBBox());
+    return viewport ? viewport.getBBox() :
+        (svgElement.viewBox?.baseVal?.width > 0 ? svgElement.viewBox.baseVal : svgElement.getBBox());
 };
 
 const createErrorDisplay = (errorMessage) => {
@@ -102,19 +102,19 @@ const createErrorDisplay = (errorMessage) => {
 
 const prepareSvgForExport = (svgElement) => {
     const clonedSvg = svgElement.cloneNode(true);
-    
+
     // Inject styles
     const styleElement = document.createElement('style');
     styleElement.textContent = collectCssStyles();
     clonedSvg.insertBefore(styleElement, clonedSvg.firstChild);
-    
+
     // Remove svg-pan-zoom transformations
     const clonedViewport = clonedSvg.querySelector('.svg-pan-zoom_viewport');
     if (clonedViewport) {
         clonedViewport.removeAttribute('transform');
         clonedViewport.removeAttribute('style');
     }
-    
+
     return clonedSvg;
 };
 
@@ -129,14 +129,14 @@ const copyImageToClipboard = async (svgElement, bbox) => {
                     // Convert data URL to blob
                     const response = await fetch(dataUrl);
                     const blob = await response.blob();
-                    
+
                     // Use Clipboard API to copy image
                     await navigator.clipboard.write([
                         new ClipboardItem({
                             [blob.type]: blob
                         })
                     ]);
-                    
+
                     resolve();
                 } catch (error) {
                     console.error('Failed to copy image to clipboard:', error);
@@ -153,22 +153,22 @@ const copyImageToClipboard = async (svgElement, bbox) => {
 const convertSvgToImage = (svgElement, bbox, format, onSuccess, onError) => {
     const { width, height, x, y } = bbox;
     const clonedSvg = prepareSvgForExport(svgElement);
-    
-    console.log('Export size:', { 
-        width, 
+
+    console.log('Export size:', {
+        width,
         height,
         aspectRatio: (width / height).toFixed(2)
     });
-    
+
     // Set SVG attributes
     Object.assign(clonedSvg.style, { width: '', height: '', maxWidth: '' });
     clonedSvg.setAttribute('width', width);
     clonedSvg.setAttribute('height', height);
     clonedSvg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
-    
+
     // Serialize and encode
     const svgXML = new XMLSerializer().serializeToString(clonedSvg).replace(/\0/g, '');
-    
+
     let svgDataUrl;
     try {
         svgDataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgXML)));
@@ -177,19 +177,19 @@ const convertSvgToImage = (svgElement, bbox, format, onSuccess, onError) => {
         onError(CONFIG.MESSAGES.ENCODE_FAILED);
         return;
     }
-    
+
     // Convert to image
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    
+
     const loadTimeout = setTimeout(() => {
         console.error('Image loading timeout');
         onError(CONFIG.MESSAGES.IMAGE_TIMEOUT);
     }, CONFIG.LOAD_TIMEOUT);
-    
+
     img.onload = () => {
         clearTimeout(loadTimeout);
-        
+
         try {
             console.log('Image loaded successfully!');
             console.log('Image natural dimensions:', img.naturalWidth, 'x', img.naturalHeight);
@@ -219,13 +219,13 @@ const convertSvgToImage = (svgElement, bbox, format, onSuccess, onError) => {
                 onError(CONFIG.MESSAGES.CANVAS_FAILED);
                 return;
             }
-            
+
             // Use dark background if dark mode is enabled
             const isDarkMode = document.body.classList.contains('dark-mode');
             ctx.fillStyle = isDarkMode ? '#1e1e2e' : 'white';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             console.log(`${isDarkMode ? 'Dark' : 'White'} background filled`);
-            
+
             console.log('Drawing image at:', CONFIG.PADDING, CONFIG.PADDING, 'with size:', width, height);
             ctx.drawImage(img, CONFIG.PADDING, CONFIG.PADDING, width, height);
             console.log('Image drawn successfully');
@@ -239,7 +239,7 @@ const convertSvgToImage = (svgElement, bbox, format, onSuccess, onError) => {
                 onError(CONFIG.MESSAGES.EXPORT_FAILED);
                 return;
             }
-            
+
             if (!dataUrl || dataUrl === 'data:,' || dataUrl.length < 100) {
                 console.error('Generated data URL is empty or invalid');
                 console.log('Canvas size:', canvas.width, 'x', canvas.height);
@@ -255,7 +255,7 @@ const convertSvgToImage = (svgElement, bbox, format, onSuccess, onError) => {
             onError(CONFIG.MESSAGES.EXPORT_ERROR);
         }
     };
-    
+
     img.onerror = (e) => {
         clearTimeout(loadTimeout);
         console.error('Image load error:', e);
@@ -263,7 +263,7 @@ const convertSvgToImage = (svgElement, bbox, format, onSuccess, onError) => {
         console.log('SVG XML preview:', svgXML.substring(0, 500));
         onError(CONFIG.MESSAGES.IMAGE_LOAD_ERROR);
     };
-    
+
     img.src = svgDataUrl;
 };
 
@@ -278,7 +278,7 @@ const saveFile = async (content, filename, mimeType) => {
                     accept: { [mimeType]: ['.txt', '.mmd'] },
                 }],
             });
-            
+
             const writable = await handle.createWritable();
             await writable.write(content);
             await writable.close();
@@ -325,12 +325,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    mermaid.initialize({ 
+    mermaid.initialize({
         startOnLoad: false,
         securityLevel: 'strict',
         suppressErrors: true,
         theme: isDarkMode ? 'dark' : 'default',
-        flowchart: { 
+        flowchart: {
             htmlLabels: false,
             useMaxWidth: false
         },
@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         tabSize: 4,
         indentWithTabs: false,
         autofocus: true,
-        styleActiveLine: {nonEmpty: true},
+        styleActiveLine: { nonEmpty: true },
         matchBrackets: true
     });
 
@@ -613,7 +613,7 @@ radar-beta
 
     // Theme selector initialization and change event
     themeSelector.value = currentTheme;
-    themeSelector.addEventListener('change', function() {
+    themeSelector.addEventListener('change', function () {
         const newTheme = this.value;
         editor.setOption('theme', newTheme);
         localStorage.setItem('editorTheme', newTheme);
@@ -639,6 +639,50 @@ radar-beta
         debouncedRender();
     });
 
+    // View Toggle Logic
+    const viewToggleBtn = document.getElementById('view-toggle-btn');
+    const splitContainer = document.querySelector('.split-container');
+    const codeIcon = viewToggleBtn.querySelector('.code-icon');
+    const previewIcon = viewToggleBtn.querySelector('.preview-icon');
+    const btnText = viewToggleBtn.querySelector('.btn-text');
+
+    // Initial state: Show Code
+    let isCodeView = true;
+    splitContainer.classList.add('show-code');
+
+    viewToggleBtn.addEventListener('click', () => {
+        isCodeView = !isCodeView;
+
+        if (isCodeView) {
+            splitContainer.classList.remove('show-diagram');
+            splitContainer.classList.add('show-code');
+            codeIcon.style.display = 'block';
+            previewIcon.style.display = 'none';
+            btnText.textContent = 'Preview';
+            viewToggleBtn.title = 'Switch to Preview';
+        } else {
+            splitContainer.classList.remove('show-code');
+            splitContainer.classList.add('show-diagram');
+            codeIcon.style.display = 'none';
+            previewIcon.style.display = 'block';
+            btnText.textContent = 'Code';
+            viewToggleBtn.title = 'Switch to Code';
+
+            // Trigger resize for svg-pan-zoom and mermaid to adjust
+            setTimeout(() => {
+                window.dispatchEvent(new Event('resize'));
+                // Force re-render to ensure diagram appears if it was hidden during update
+                renderDiagram().then(() => {
+                    if (panZoomInstance) {
+                        panZoomInstance.resize();
+                        panZoomInstance.fit();
+                        panZoomInstance.center();
+                    }
+                });
+            }, 100);
+        }
+    });
+
     const showToast = (message) => {
         toast.textContent = message;
         toast.classList.add('show');
@@ -660,7 +704,7 @@ radar-beta
             clientHeight: svgElement.clientHeight,
             viewBox: svgElement.getAttribute('viewBox')
         });
-        
+
         const bbox = getSvgDimensions(svgElement);
         const { width, height, x, y } = bbox;
         console.log('Using BBox:', { x, y, width, height });
@@ -691,26 +735,26 @@ radar-beta
 
     const renderDiagram = async () => {
         const mermaidTemp = document.getElementById('mermaid-temp');
-        
+
         try {
             const mermaidCode = editor.getValue();
-            
+
             // 먼저 parse로 유효성 검사 (DOM 삽입 방지)
             const parseResult = await mermaid.parse(mermaidCode);
             if (!parseResult) {
                 // parse 실패 시 차트 유지
                 return;
             }
-            
+
             const uniqueId = 'graphDiv-' + Date.now();
-            
+
             // 임시 컨테이너에 먼저 렌더링 시도
             mermaidTemp.innerHTML = '';
             const result = await mermaid.render(uniqueId, mermaidCode);
-            
+
             // 성공했을 때만 실제 다이어그램 영역 업데이트
             mermaidDiagram.innerHTML = result.svg;
-            
+
             // 에러 마커 제거 (성공 시)
             editor.getAllMarks().forEach(mark => mark.clear());
 
@@ -730,10 +774,10 @@ radar-beta
                 });
                 console.log('SVG viewBox:', svgElement.getAttribute('viewBox'));
                 console.log('============================');
-                
+
                 // Destroy existing instance if present (prevent memory leaks)
                 if (panZoomInstance) {
-                    try { panZoomInstance.destroy(); } catch(e) {}
+                    try { panZoomInstance.destroy(); } catch (e) { }
                 }
 
                 // Adjust Mermaid SVG style (prevent conflict with PanZoom)
@@ -749,14 +793,14 @@ radar-beta
                     center: true,
                     minZoom: 0.5,
                     maxZoom: 10,
-                    onZoom: function(newZoom) {
+                    onZoom: function (newZoom) {
                         const zoomLevelEl = document.getElementById('zoom-level');
                         if (zoomLevelEl) {
                             zoomLevelEl.textContent = `${Math.round(newZoom * 100)}%`;
                         }
                     }
                 });
-                
+
                 // Initial zoom level display
                 const zoomLevelEl = document.getElementById('zoom-level');
                 if (zoomLevelEl) {
@@ -766,12 +810,12 @@ radar-beta
         } catch (e) {
             // parse 실패 또는 render 실패 시 차트 유지
             mermaidTemp.innerHTML = '';
-            
+
             // Frontmatter 줄 수 계산
             const mermaidCode = editor.getValue();
             const lines = mermaidCode.split('\n');
             let frontmatterLines = 0;
-            
+
             // Frontmatter 감지: 첫 줄이 ---로 시작하면
             if (lines[0] && lines[0].trim() === '---') {
                 // 두 번째 ---를 찾아서 frontmatter 줄 수 계산
@@ -783,49 +827,49 @@ radar-beta
                     }
                 }
             }
-            
+
             console.log('Frontmatter lines detected:', frontmatterLines);
-            
+
             // 에러 메시지에서 줄 번호 추출 (다양한 패턴 지원)
             const errorMessage = e.message || e.str || String(e);
             let errorLine = null;
-            
+
             // 패턴 1: "Parse error on line 15"
             let lineMatch = errorMessage.match(/line[\s:]+(\d+)/i);
             if (lineMatch) {
                 errorLine = parseInt(lineMatch[1], 10) - 1 + frontmatterLines;
             }
-            
+
             // 패턴 2: e.hash.line (파서 에러 객체)
             if (e.hash && e.hash.line !== undefined) {
                 errorLine = e.hash.line - 1 + frontmatterLines;
             }
-            
+
             // 패턴 3: e.hash.loc.first_line
             if (e.hash && e.hash.loc && e.hash.loc.first_line !== undefined) {
                 errorLine = e.hash.loc.first_line - 1 + frontmatterLines;
             }
-            
+
             console.log('Detected error line (before adjustment):', errorLine - frontmatterLines);
             console.log('Adjusted error line (with frontmatter):', errorLine);
-            
+
             if (errorLine !== null && errorLine >= 0) {
                 const lineLength = editor.getLine(errorLine)?.length || 0;
-                
+
                 // 기존 마커 제거
                 editor.getAllMarks().forEach(mark => mark.clear());
-                
+
                 // 에러 라인에 빨간색 밑줄 표시
                 if (errorLine < editor.lineCount()) {
                     editor.markText(
                         { line: errorLine, ch: 0 },
                         { line: errorLine, ch: lineLength },
-                        { 
+                        {
                             className: 'error-line',
                             title: errorMessage
                         }
                     );
-                    
+
                     // 에러 라인으로 스크롤
                     editor.scrollIntoView({ line: errorLine, ch: 0 }, 100);
                 }
@@ -858,7 +902,7 @@ radar-beta
         // URI encode then Base64 encode
         const encodedCode = btoa(encodeURIComponent(mermaidCode));
         const url = `${window.location.origin}${window.location.pathname}?code=${encodedCode}`;
-        
+
         navigator.clipboard.writeText(url).then(() => {
             showToast(CONFIG.MESSAGES.URL_COPIED);
         }, (err) => {
@@ -870,7 +914,7 @@ radar-beta
     // Save text file
     saveTxtBtn.addEventListener('click', async () => {
         const text = editor.getValue();
-        
+
         try {
             const saved = await saveFile(text, 'mermaid-diagram.txt', 'text/plain');
             if (saved) {
@@ -896,24 +940,24 @@ radar-beta
         reader.onload = (e) => {
             const content = e.target.result;
             editor.setValue(content);
-            
+
             // Render diagram
             renderDiagram();
-            
+
             // Update auto-save
             const data = {
                 code: content,
                 timestamp: Date.now()
             };
             localStorage.setItem(CONFIG.MERMAID_CODE_KEY, JSON.stringify(data));
-            
+
             showToast(CONFIG.MESSAGES.FILE_LOADED);
         };
         reader.onerror = () => {
             showToast(CONFIG.MESSAGES.FILE_LOAD_FAILED);
         };
         reader.readAsText(file);
-        
+
         // Reset to allow selecting the same file again
         loadTxtInput.value = '';
     });
@@ -1103,12 +1147,12 @@ radar-beta
             document.body.classList.remove('dark-mode');
         }
         // Update Mermaid theme
-        mermaid.initialize({ 
+        mermaid.initialize({
             startOnLoad: false,
             securityLevel: 'strict',
             suppressErrors: true,
             theme: isDark ? 'dark' : 'default',
-            flowchart: { 
+            flowchart: {
                 htmlLabels: false,
                 useMaxWidth: false
             },
@@ -1174,7 +1218,7 @@ radar-beta
     document.addEventListener('keydown', (e) => {
         // Check if target is not the editor to avoid conflicts
         if (e.target.classList.contains('CodeMirror')) return;
-        
+
         if (e.ctrlKey || e.metaKey) {
             if (e.key === '+' || e.key === '=') {
                 e.preventDefault();
@@ -1202,7 +1246,7 @@ radar-beta
                 if (panZoomInstance) {
                     const pan = panZoomInstance.getPan();
                     const panStep = 50; // pixels to move per key press
-                    
+
                     switch (e.key) {
                         case 'i':
                             panZoomInstance.pan({ x: pan.x, y: pan.y + panStep });
@@ -1224,7 +1268,7 @@ radar-beta
 
     // Handle URL parameters and initial render
     const loadedFromUrl = setMermaidCodeFromUrl();
-    
+
     if (!loadedFromUrl) {
         const savedData = localStorage.getItem(CONFIG.MERMAID_CODE_KEY);
         if (savedData) {
