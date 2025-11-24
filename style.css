@@ -459,6 +459,20 @@ body.dark-mode .modal-content>p {
         width: 20px;
         height: 20px;
     }
+
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .logo {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .title-group h1 {
+        font-size: 24px;
+    }    
 }
 
 /* Help Link */
@@ -544,22 +558,6 @@ body.dark-mode .github-link:hover {
 
 body.dark-mode .github-link:focus-visible {
     box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.55), 0 4px 14px rgba(0, 0, 0, 0.7);
-}
-
-@media (max-width: 600px) {
-    .header-content {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .logo {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .title-group h1 {
-        font-size: 24px;
-    }
 }
 
 .split-container {
@@ -1031,24 +1029,6 @@ body.dark-mode .export-item:hover {
 
 .btn-primary:hover {
     background: linear-gradient(135deg, var(--color-primary-light) 0%, #8a5bb5 100%);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .toolbar {
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .toolbar-group {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .btn {
-        flex: 1;
-        justify-content: center;
-    }
 }
 
 #mermaid-diagram {
