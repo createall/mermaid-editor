@@ -296,3 +296,156 @@ treemap-beta
     "Item B1": 15
     "Item B2": 25`
 };
+
+// Mermaid autocomplete hints
+export const MERMAID_HINTS = {
+    diagramTypes: [
+        'flowchart', 'graph', 'sequenceDiagram', 'classDiagram', 'stateDiagram', 'stateDiagram-v2',
+        'erDiagram', 'journey', 'gantt', 'pie', 'quadrantChart', 'requirementDiagram', 'gitGraph',
+        'C4Context', 'C4Container', 'C4Component', 'C4Dynamic', 'C4Deployment',
+        'mindmap', 'timeline', 'sankey-beta', 'xychart-beta', 'block-beta', 'packet-beta',
+        'kanban', 'architecture', 'architecture-beta'
+    ],
+    directions: ['TD', 'TB', 'BT', 'RL', 'LR'],
+    flowchartKeywords: [
+        'subgraph', 'end', 'style', 'class', 'classDef', 'click', 'linkStyle', 'direction',
+        'shape', 'manual-file', 'manual-input', 'docs', 'procs', 'paper-tape', 'label',
+        'rounded', 'stadium', 'subproc', 'cyl', 'circle', 'odd', 'diamond', 'hex', 'lean-r', 'lean-l',
+        'trap-b', 'trap-t', 'dbl-circ', 'text', 'notch-rect', 'lin-rect', 'sm-circ', 'framed-circle', 'fork',
+        'hourglass', 'comment', 'brace-r', 'braces', 'bolt', 'doc', 'delay', 'das', 'lin-cyl', 'curv-trap',
+        'div-rect', 'tri', 'win-pane', 'f-circ', 'lin-doc', 'notch-pent', 'flip-tri', 'sl-rect', 'processes',
+        'flag', 'bow-rect', 'cross-circ', 'tag-doc', 'tag-rect'
+    ],
+    sequenceKeywords: [
+        'participant', 'actor', 'activate', 'deactivate', 'Note', 'loop', 'alt', 'else', 'opt',
+        'par', 'and', 'rect', 'autonumber', 'over', 'left of', 'right of', 'type', 'database', 'collections', 'queue',
+        'create', 'box', 'critical', 'option', 'break', 'rgb'
+    ],
+    classKeywords: [
+        'class', 'note', 'link', 'callback', 'direction', 'namespace', 'for',
+        '<<interface>>', '<<abstract>>', '<<enumeration>>', '<<service>>'
+    ],
+    stateKeywords: [
+        'state', '[*]', 'note', '<<fork>>', '<<join>>', '<<choice>>', 'direction', 'if_state', 'False', 'True'
+    ],
+    erKeywords: ['entity', 'attributes'],
+    ganttKeywords: [
+        'title', 'dateFormat', 'axisFormat', 'section', 'excludes', 'todayMarker',
+        'active', 'done', 'crit', 'milestone', 'after'
+    ],
+    quadrantKeywords: [
+        'title', 'x-axis', 'y-axis', 'quadrant-1', 'quadrant-2', 'quadrant-3', 'quadrant-4'
+    ],
+    requirementKeywords: [
+        'requirement', 'id', 'text', 'risk', 'verifymethod', 'element', 'type', 'satisfies'
+    ],
+    mindmapKeywords: [
+        'root', 'Origins', 'Popularisation', 'Research', 'Uses', 'Tools'
+    ],
+    xyKeywords: [
+        'title', 'x-axis', 'y-axis', 'bar', 'line'
+    ],
+    blockKeywords: [
+        'columns', 'service', 'db', 'disk', 'server', 'group', 'in', 'end', 'style'
+    ],
+    packetKeywords: [
+        'Source Port', 'Destination Port', 'Sequence Number', 'Acknowledgment Number',
+        'Data Offset', 'Reserved', 'URG', 'ACK', 'PSH', 'RST', 'SYN', 'FIN',
+        'Window', 'Checksum', 'Urgent Pointer', 'Options and Padding', 'Data'
+    ],
+    kanbanKeywords: [
+        'config', 'ticketBaseUrl', 'Todo', 'In progress', 'Ready for test', 'Done'
+    ],
+    architectureKeywords: [
+        'group', 'service', 'in'
+    ],
+    radarKeywords: [
+        'axis', 'curve', 'max', 'min'
+    ],
+    gitKeywords: ['commit', 'branch', 'checkout', 'merge', 'tag', 'reset', 'revert'],
+    frontmatterKeywords: ['title', 'config', 'theme', 'themeVariables', 'layout'],
+    themes: ['default', 'dark', 'forest', 'neutral', 'base'],
+    arrows: [
+        '-->', '---', '-.->',  '-.-', '==>', '===', '--o', '--x',
+        '<-->', 'o--o', 'x--x', '->', '->>', '-x', '-)','--)', '->>','-->>',
+        '<|--', '*--', 'o--', '..|>', '..>', '||--||', '||--o{', '}o--o{', '}|..|{', '||--|{', '}o..o{',
+        '..', '--*', '--|>', '()--', '--()'
+    ],
+    nodeShapes: [
+        '[]', '()', '([])', '[[]]', '[()]', '(())', '>]', '{}', '{{}}',
+        '[//]', '[\\\\]', '[/\\]', '[\\/]'
+    ]
+};
+
+/**
+ * Mermaid autocomplete hint function for CodeMirror
+ */
+export function getMermaidHints(editor, options) {
+    const cursor = editor.getCursor();
+    const line = editor.getLine(cursor.line);
+    
+    // Find the start of the current word by going backwards from cursor
+    let start = cursor.ch;
+    const wordChars = /[\w\-<>|\[\]{}()\/.\\*=]/;
+    
+    while (start > 0 && wordChars.test(line.charAt(start - 1))) {
+        start--;
+    }
+    
+    const end = cursor.ch;
+    const currentWord = line.slice(start, end).toLowerCase();
+
+    // Combine all keywords
+    const allKeywords = [
+        ...MERMAID_HINTS.diagramTypes,
+        ...MERMAID_HINTS.directions,
+        ...MERMAID_HINTS.flowchartKeywords,
+        ...MERMAID_HINTS.sequenceKeywords,
+        ...MERMAID_HINTS.classKeywords,
+        ...MERMAID_HINTS.stateKeywords,
+        ...MERMAID_HINTS.erKeywords,
+        ...MERMAID_HINTS.ganttKeywords,
+        ...MERMAID_HINTS.quadrantKeywords,
+        ...MERMAID_HINTS.requirementKeywords,
+        ...MERMAID_HINTS.mindmapKeywords,
+        ...MERMAID_HINTS.gitKeywords,
+        ...MERMAID_HINTS.xyKeywords,
+        ...MERMAID_HINTS.blockKeywords,
+        ...MERMAID_HINTS.packetKeywords,
+        ...MERMAID_HINTS.kanbanKeywords,
+        ...MERMAID_HINTS.architectureKeywords,
+        ...MERMAID_HINTS.radarKeywords,
+        ...MERMAID_HINTS.frontmatterKeywords,
+        ...MERMAID_HINTS.themes,
+        ...MERMAID_HINTS.arrows,
+        ...MERMAID_HINTS.nodeShapes
+    ];
+
+    // Remove duplicates
+    const uniqueKeywords = [...new Set(allKeywords)];
+
+    // Filter keywords based on current input
+    const matches = uniqueKeywords.filter(keyword => {
+        try {
+            return keyword.toLowerCase().startsWith(currentWord);
+        } catch (e) {
+            console.error('Error filtering keywords for autocomplete:', e);
+        }
+    });
+
+    // Don't show hints if currentWord is empty or no matches
+    if (currentWord.length === 0 || matches.length === 0) {
+        return null;
+    }
+
+    // Don't show hints if there's only one exact match
+    if (matches.length === 1 && matches[0].toLowerCase() === currentWord) {
+        return null;
+    }
+
+    return {
+        list: matches,
+        from: { line: cursor.line, ch: start },
+        to: { line: cursor.line, ch: end }
+    };
+}

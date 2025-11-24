@@ -1323,3 +1323,120 @@ body.dark-mode .export-item:hover {
         justify-content: center;
     }
 }
+
+/* ========================================
+   CodeMirror Autocomplete Custom Styles
+   ======================================== */
+
+.CodeMirror-hints {
+    position: absolute;
+    z-index: 10;
+    overflow: hidden;
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+    background: var(--bg-container-light);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 
+                0 2px 8px rgba(0, 0, 0, 0.1);
+    font-family: inherit;
+    font-size: 13px;
+    max-height: 300px;
+    overflow-y: auto;
+    min-width: 200px;
+    backdrop-filter: blur(10px);
+}
+
+body.dark-mode .CodeMirror-hints {
+    background: var(--bg-container-dark);
+    border-color: var(--border-dark);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4),
+                0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.CodeMirror-hint {
+    margin: 0;
+    padding: 8px 12px;
+    cursor: pointer;
+    color: var(--text-primary-light);
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    border-left: 3px solid transparent;
+}
+
+body.dark-mode .CodeMirror-hint {
+    color: var(--text-primary-dark);
+}
+
+/* Hover effect */
+.CodeMirror-hint:hover {
+    background: linear-gradient(90deg, 
+        rgba(102, 126, 234, 0.1) 0%, 
+        rgba(102, 126, 234, 0.05) 100%);
+    border-left-color: var(--color-primary);
+    transform: translateX(2px);
+}
+
+body.dark-mode .CodeMirror-hint:hover {
+    background: linear-gradient(90deg, 
+        rgba(102, 126, 234, 0.2) 0%, 
+        rgba(102, 126, 234, 0.1) 100%);
+}
+
+/* Active/Selected item */
+.CodeMirror-hint-active,
+.CodeMirror-hint-active:hover {
+    background: linear-gradient(90deg, 
+        var(--color-primary) 0%, 
+        var(--color-primary-light) 100%) !important;
+    color: #fff !important;
+    border-left-color: #fff;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* Scrollbar styling */
+.CodeMirror-hints::-webkit-scrollbar {
+    width: 8px;
+}
+
+.CodeMirror-hints::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.CodeMirror-hints::-webkit-scrollbar-thumb {
+    background: rgba(102, 126, 234, 0.3);
+    border-radius: 4px;
+}
+
+.CodeMirror-hints::-webkit-scrollbar-thumb:hover {
+    background: rgba(102, 126, 234, 0.5);
+}
+
+body.dark-mode .CodeMirror-hints::-webkit-scrollbar-thumb {
+    background: rgba(102, 126, 234, 0.4);
+}
+
+body.dark-mode .CodeMirror-hints::-webkit-scrollbar-thumb:hover {
+    background: rgba(102, 126, 234, 0.6);
+}
+
+/* Animation */
+@keyframes hintFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.CodeMirror-hints {
+    animation: hintFadeIn 0.15s ease-out;
+}

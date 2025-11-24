@@ -93,7 +93,17 @@ export const renderDiagram = async (editor) => {
     const mermaidTemp = document.getElementById('mermaid-temp');
 
     try {
-        const mermaidCode = editor.getValue();
+        const mermaidCode = editor.getValue().trim();
+
+        // Clear diagram if editor is empty
+        if (!mermaidCode) {
+            mermaidDiagram.innerHTML = '';
+            if (panZoomInstance) {
+                try { panZoomInstance.destroy(); } catch (e) { }
+                panZoomInstance = null;
+            }
+            return;
+        }
 
         // Parse validation first (prevents DOM injection)
         const parseResult = await window.mermaid.parse(mermaidCode);

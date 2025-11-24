@@ -1,4 +1,4 @@
-import { CONFIG } from './config.js';
+import { CONFIG, getMermaidHints } from './config.js';
 import { debounce } from './utils.js';
 import { initializeMermaid, renderDiagram, applyDarkMode } from './diagram.js';
 import {
@@ -55,7 +55,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         indentWithTabs: false,
         autofocus: true,
         styleActiveLine: { nonEmpty: true },
-        matchBrackets: true
+        matchBrackets: true,
+        extraKeys: {
+            'Ctrl-Space': 'autocomplete'
+        },
+        hintOptions: {
+            hint: getMermaidHints,
+            completeSingle: false
+        }
     });
 
     // Create render callback
@@ -63,13 +70,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     const debouncedRender = debounce(renderCallback, CONFIG.DEBOUNCE_DELAY);
 
     // Setup CodeMirror change handler
-    editor.on('change', () => {
+    editor.on('change', (cm, change) => {
         const data = {
             code: editor.getValue(),
             timestamp: Date.now()
         };
         localStorage.setItem(CONFIG.MERMAID_CODE_KEY, JSON.stringify(data));
         debouncedRender();
+
+        // Auto-trigger autocomplete while typing
+        if (change.origin === '+input') {
+            const cursor = cm.getCursor();
+            const line = cm.getLine(cursor.line);
+            const char = line.charAt(cursor.ch - 1);
+            
+            // Don't show hints for space, newline, or special punctuation
+            if (char && char.match(/[a-zA-Z0-9\-<>*.=|]/)) {
+                setTimeout(() => {
+                    cm.showHint({
+                        hint: getMermaidHints,
+                        completeSingle: false
+                    });
+                }, 100);
+            }
+        }
     });
 
     // Setup UI components

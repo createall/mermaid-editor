@@ -13,6 +13,11 @@ A modern, web-based tool for creating beautiful diagrams using [Mermaid.js](http
 - **Line Numbers**: Built-in line numbering with smart bracket matching
 - **Auto-indent**: Intelligent code formatting and indentation
 - **Theme Persistence**: Selected editor theme saved to localStorage
+- **Smart Autocomplete**: 
+  - Real-time keyword suggestions while typing
+  - Supports Mermaid diagram types, keywords, and syntax
+  - Intelligent filtering based on input
+  - Keyboard shortcut: `Ctrl + Space` for manual trigger
 
 ### Editor & Preview
 - **Real-time Rendering**: Diagrams update automatically as you type
@@ -22,12 +27,11 @@ A modern, web-based tool for creating beautiful diagrams using [Mermaid.js](http
 - **Keyboard Shortcuts**: 
   - `Ctrl + +/-/0`: Zoom in/out/reset
   - `Ctrl + i/k/j/l`: Pan diagram in all directions
-- **Background Patterns**: Single button cycles **dot → grid → none (blank)**; selection persists via localStorage for consistent visualization
+  - `Ctrl + Space`: Trigger autocomplete manually
 
 ### Mobile Experience
 - **Responsive Layout**: Optimized interface for mobile devices and tablets
 - **View Toggle**: Switch between Code and Preview modes on smaller screens to maximize workspace
-- **Touch-Friendly**: Larger touch targets and optimized controls for touch input
 
 ### Save & Share
 - **Auto-Save**: Automatic local storage backup (1-hour expiration)
@@ -50,7 +54,7 @@ A modern, web-based tool for creating beautiful diagrams using [Mermaid.js](http
    - **Save/Load**: Export or import diagram code
    - **Export**: Click to open dropdown menu and select format (PNG, JPG, SVG, or PDF)
    - **Copy**: Copy diagram image directly to clipboard (works in modern browsers with HTTPS)
-  - **Background**: Click repeatedly to cycle dot → grid → none (blank)
+   - **Background**: Click repeatedly to cycle dot → grid → none (blank)
    - **Zoom Controls**: Use buttons or keyboard shortcuts to zoom and pan
 
 For more syntax details, visit the [official Mermaid documentation](https://mermaid.js.org/syntax/flowchart.html).
@@ -60,21 +64,10 @@ For more syntax details, visit the [official Mermaid documentation](https://merm
 - **Core**: HTML5, CSS3, Vanilla JavaScript
 - **Libraries**:
   - [Mermaid.js](https://mermaid.js.org/) v11+ - Diagram rendering
-  - [CodeMirror](https://codemirror.net/) 5.65.16 - Professional code editor with syntax highlighting
+  - [CodeMirror](https://codemirror.net/) 5.65.16 - Professional code editor with syntax highlighting and autocomplete
   - [Split.js](https://split.js.org/) 1.6.5 - Resizable panels
   - [svg-pan-zoom](https://github.com/ariutta/svg-pan-zoom) 3.6.1 - SVG interaction
 - **CDN**: Cloudflare, jsDelivr, unpkg
-
-## 📂 Project Structure
-
-```
-mermaid-editor/
-├── index.html          # Main HTML file
-├── style.css           # Styling and layout
-├── script.js           # Application logic
-├── README.md           # Documentation
-└── LICENSE             # MIT License
-```
 
 ## 📋 Supported Diagram Types
 
