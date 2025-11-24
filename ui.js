@@ -310,8 +310,12 @@ export const setupViewToggle = (renderCallback) => {
     let isCodeView = true;
     splitContainer.classList.add('show-code');
 
-    viewToggleBtn.addEventListener('click', () => {
-        isCodeView = !isCodeView;
+    const updateViewState = (forceCodeView) => {
+        const newCodeView = forceCodeView !== undefined ? forceCodeView : isCodeView;
+        
+        if (newCodeView !== isCodeView) {
+            isCodeView = newCodeView;
+        }
 
         if (isCodeView) {
             splitContainer.classList.remove('show-diagram');
@@ -340,7 +344,34 @@ export const setupViewToggle = (renderCallback) => {
                 });
             }, 100);
         }
+    };
+
+    // Handle window resize to sync state when crossing mobile breakpoint
+    let resizeTimeout;
+    const handleResize = () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            const isMobile = window.innerWidth <= 768;
+            if (!isMobile) {
+                // Reset to code view when going back to desktop
+                updateViewState(true);
+                splitContainer.classList.remove('show-code', 'show-diagram');
+            } else if (!splitContainer.classList.contains('show-code') && !splitContainer.classList.contains('show-diagram')) {
+                // Initialize mobile view if no class is set
+                updateViewState(true);
+            }
+        }, 150);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    viewToggleBtn.addEventListener('click', () => {
+        isCodeView = !isCodeView;
+        updateViewState();
     });
+
+    // Initial state check
+    handleResize();
 };
 
 /**

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Mermaid Diagram Editor</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .about-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 40px;
+            background: var(--bg-primary, #fff);
+            color: var(--text-primary, #333);
+            line-height: 1.8;
+        }
+
+        body.dark-mode .about-container {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .about-container h1 {
+            font-size: 2.5em;
+            margin-bottom: 0.5em;
+            color: #56ab2f;
+            border-bottom: 3px solid #56ab2f;
+            padding-bottom: 0.3em;
+        }
+
+        .about-container h2 {
+            font-size: 1.8em;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            color: #56ab2f;
+        }
+
+        .about-container h3 {
+            font-size: 1.3em;
+            margin-top: 1.2em;
+            margin-bottom: 0.5em;
+            color: #6fbd4a;
+        }
+
+        .about-container p {
+            margin-bottom: 1em;
+        }
+
+        .about-container ul {
+            margin-left: 2em;
+            margin-bottom: 1em;
+        }
+
+        .about-container li {
+            margin-bottom: 0.5em;
+        }
+
+        .about-container code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        body.dark-mode .about-container code {
+            background: #2d2d2d;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: #56ab2f;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .back-link:hover {
+            background: #6fbd4a;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 4px solid #56ab2f;
+            border-radius: 5px;
+        }
+
+        body.dark-mode .feature-card {
+            background: #2d2d2d;
+        }
+
+        .feature-card h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="about-container">
+        <a href="index.html" class="back-link">← Back to Editor</a>
+
+        <h1>About Mermaid Diagram Editor</h1>
+        
+        <p>
+            A modern, web-based tool for creating beautiful diagrams using <a href="https://mermaid.js.org/" target="_blank">Mermaid.js</a>. 
+            This editor provides a professional development environment with real-time rendering, advanced export options, 
+            and a seamless user experience across all devices.
+        </p>
+
+        <h2>✨ Key Features</h2>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>🎨 Professional Code Editor</h3>
+                <ul>
+                    <li>Syntax highlighting with YAML support</li>
+                    <li>9 beautiful editor themes</li>
+                    <li>Line numbers & bracket matching</li>
+                    <li>Smart auto-indentation</li>
+                    <li>Active line highlighting</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>⚡ Real-time Preview</h3>
+                <ul>
+                    <li>Instant diagram rendering</li>
+                    <li>Adjustable split-view layout</li>
+                    <li>Zoom & pan navigation</li>
+                    <li>Keyboard shortcuts for control</li>
+                    <li>Background pattern options</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>📱 Mobile Optimized</h3>
+                <ul>
+                    <li>Responsive design for all screens</li>
+                    <li>Code/Preview view toggle</li>
+                    <li>Touch-friendly controls</li>
+                    <li>Optimized mobile interface</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>💾 Save & Share</h3>
+                <ul>
+                    <li>Auto-save to local storage</li>
+                    <li>Shareable diagram URLs</li>
+                    <li>Export as PNG, JPG, SVG, PDF</li>
+                    <li>Copy to clipboard</li>
+                    <li>Save/load code files</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>🎯 Theme Support</h3>
+                <ul>
+                    <li>Dark & light modes</li>
+                    <li>Theme-aware exports</li>
+                    <li>Persistent theme selection</li>
+                    <li>Customizable backgrounds</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>🚀 Performance</h3>
+                <ul>
+                    <li>Zero build process required</li>
+                    <li>Fast rendering engine</li>
+                    <li>Optimized for large diagrams</li>
+                    <li>Smart SVG handling</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>🎨 Editor Themes</h2>
+        <p>Choose from 9 carefully selected themes to match your preference:</p>
+        <ul>
+            <li><strong>Material Darker</strong> - Modern dark theme with excellent contrast</li>
+            <li><strong>Monokai</strong> - Popular theme inspired by Sublime Text</li>
+            <li><strong>Dracula</strong> - Dark theme with vibrant colors</li>
+            <li><strong>Nord</strong> - Cool, arctic-inspired color palette</li>
+            <li><strong>Solarized Dark</strong> - Low-contrast dark theme for reduced eye strain</li>
+            <li><strong>Solarized Light</strong> - Companion light theme to Solarized Dark</li>
+            <li><strong>Eclipse</strong> - Clean light theme inspired by Eclipse IDE</li>
+            <li><strong>IntelliJ IDEA</strong> - Light theme from the popular Java IDE</li>
+            <li><strong>Ambiance</strong> - Subtle dark theme with warm tones</li>
+        </ul>
+
+        <h2>⌨️ Keyboard Shortcuts</h2>
+        
+        <h3>Zoom Controls</h3>
+        <ul>
+            <li><code>Ctrl + +</code> - Zoom in</li>
+            <li><code>Ctrl + -</code> - Zoom out</li>
+            <li><code>Ctrl + 0</code> - Reset zoom to 100%</li>
+        </ul>
+
+        <h3>Pan Navigation</h3>
+        <ul>
+            <li><code>Ctrl + i</code> - Pan up</li>
+            <li><code>Ctrl + k</code> - Pan down</li>
+            <li><code>Ctrl + j</code> - Pan left</li>
+            <li><code>Ctrl + l</code> - Pan right</li>
+        </ul>
+
+        <h2>📤 Export Options</h2>
+        <p>Export your diagrams in multiple formats with theme-aware rendering:</p>
+        <ul>
+            <li><strong>PNG</strong> - High-quality raster image, perfect for documents and presentations</li>
+            <li><strong>JPG</strong> - Compressed image format for smaller file sizes</li>
+            <li><strong>SVG</strong> - Scalable vector graphics, ideal for web and print (auto-used for very large diagrams)</li>
+            <li><strong>PDF</strong> - Professional document format with auto-scaling to A4 size</li>
+            <li><strong>Clipboard</strong> - Copy image directly to paste into other applications (HTTPS/localhost only)</li>
+        </ul>
+
+        <h2>🔧 Technical Stack</h2>
+        <ul>
+            <li><strong>Mermaid.js</strong> - Powerful diagram generation library</li>
+            <li><strong>CodeMirror</strong> - Professional code editor component</li>
+            <li><strong>Split.js</strong> - Resizable split-view panels</li>
+            <li><strong>svg-pan-zoom</strong> - Interactive diagram navigation</li>
+            <li><strong>jsPDF</strong> - PDF generation for exports</li>
+            <li><strong>Vanilla JavaScript</strong> - No framework overhead, fast and efficient</li>
+        </ul>
+
+        <h2>🌐 Browser Compatibility</h2>
+        <p>Works on all modern browsers:</p>
+        <ul>
+            <li>Chrome/Edge (recommended)</li>
+            <li>Firefox</li>
+            <li>Safari</li>
+            <li>Mobile browsers (iOS Safari, Chrome Mobile)</li>
+        </ul>
+
+        <h2>📄 License</h2>
+        <p>This project is licensed under the MIT License.</p>
+
+        <h2>🔗 Links</h2>
+        <ul>
+            <li><a href="https://github.com/swkwon/mermaid-editor" target="_blank">GitHub Repository</a></li>
+            <li><a href="https://mermaid.js.org/" target="_blank">Mermaid.js Documentation</a></li>
+            <li><a href="https://swkwon.github.io/mermaid-editor/" target="_blank">Live Demo</a></li>
+        </ul>
+
+        <p style="margin-top: 40px; text-align: center; color: #888;">
+            Made with ❤️ for the diagram community
+        </p>
+
+        <a href="index.html" class="back-link" style="margin-top: 40px;">← Back to Editor</a>
+    </div>
+
+    <script src="ui.js"></script>
+</body>
+
+</html>

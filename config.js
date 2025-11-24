@@ -40,13 +40,19 @@ export const CONFIG = {
 
 // Sample diagram codes for different types
 export const SAMPLES = {
-    flowchart: `graph TD
+    flowchart: `---
+title: Sample Flowchart
+---
+graph TD
     A[Start] --> B{Is it?}
     B -- Yes --> C[OK]
     C --> D[Rethink]
     D --> B
     B -- No --> E[End]`,
-    sequence: `sequenceDiagram
+    sequence: `---
+title: Sample Sequence Diagram
+---
+sequenceDiagram
     participant Alice
     participant Bob
     Alice->>John: Hello John, how are you?
@@ -57,7 +63,10 @@ export const SAMPLES = {
     John-->>Alice: Great!
     John->>Bob: How about you?
     Bob-->>John: Jolly good!`,
-    class: `classDiagram
+    class: `---
+title: Sample Class Diagram
+---
+classDiagram
     Class01 <|-- AveryLongClass : Cool
     Class03 *-- Class04
     Class05 o-- Class06
@@ -71,14 +80,20 @@ export const SAMPLES = {
     Class01 : int chimp
     Class01 : int gorilla
     Class08 <--> C2: Cool label`,
-    state: `stateDiagram-v2
+    state: `---
+title: Sample State Diagram
+---
+stateDiagram-v2
     [*] --> Still
     Still --> [*]
     Still --> Moving
     Moving --> Still
     Moving --> Crash
     Crash --> [*]`,
-    er: `erDiagram
+    er: `---
+title: Sample ER Diagram
+---
+erDiagram
     CUSTOMER ||--o{ ORDER : places
     ORDER ||--|{ LINE-ITEM : contains
     CUSTOMER }|..|{ DELIVERY-ADDRESS : uses`,
@@ -119,8 +134,10 @@ export const SAMPLES = {
     Campaign D: [0.78, 0.34]
     Campaign E: [0.40, 0.34]
     Campaign F: [0.35, 0.78]`,
-    requirement: `requirementDiagram
-
+    requirement: `---
+title: Sample Requirement Diagram
+---
+requirementDiagram
     requirement test_req {
     id: 1
     text: the test text.
@@ -133,7 +150,10 @@ export const SAMPLES = {
     }
 
     test_entity - satisfies -> test_req`,
-    git: `gitGraph
+    git: `---
+title: Sample Git Graph
+---
+gitGraph
    commit
    commit
    branch develop
@@ -185,7 +205,6 @@ export const SAMPLES = {
     2005 : Youtube
     2006 : Twitter`,
     sankey: `sankey-beta
-
 Agricultural 'waste',Bio-conversion,124.729
 Bio-conversion,Liquid,0.597
 Bio-conversion,Losses,26.862
@@ -266,7 +285,10 @@ radar-beta
 
   max 100
   min 0`,
-    treemap: `treemap-beta
+    treemap: `---
+title: Sample Treemap
+---
+treemap-beta
 "Category A"
     "Item A1": 10
     "Item A2": 20
