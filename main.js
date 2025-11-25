@@ -1,6 +1,7 @@
 import { CONFIG, getMermaidHints } from './config.js';
 import { debounce } from './utils.js';
 import { initializeMermaid, renderDiagram, applyDarkMode } from './diagram.js';
+import { FirebaseManager } from './firebase-manager.js';
 import {
     setupUrlCodeLoading,
     setupCopyUrlButton,
@@ -88,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const cursor = cm.getCursor();
             const line = cm.getLine(cursor.line);
             const char = line.charAt(cursor.ch - 1);
-            
+
             // Don't show hints for space, newline, or special punctuation
             if (char && char.match(/[a-zA-Z0-9\-<>*.=|]/)) {
                 cm.showHint({
@@ -143,4 +144,197 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Initial render
     await renderCallback();
+
+    // --- Firebase Integration ---
+    const firebaseManager = new FirebaseManager((user) => {
+        updateAuthUI(user);
+    });
+
+    // Auth UI Elements
+    const loginBtn = document.getElementById('login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const userProfile = document.getElementById('user-profile');
+    const userAvatar = document.getElementById('user-avatar');
+    const userName = document.getElementById('user-name');
+    const loginModal = document.getElementById('login-modal');
+    const closeLoginModalBtn = document.getElementById('close-login-modal');
+    const googleLoginBtn = document.getElementById('google-login-btn');
+
+    // Cloud UI Elements
+    const cloudBtns = document.getElementById('cloud-btns');
+    const cloudSaveBtn = document.getElementById('cloud-save-btn');
+    const cloudLoadBtn = document.getElementById('cloud-load-btn');
+    const saveModal = document.getElementById('save-modal');
+    const closeSaveModalBtn = document.getElementById('close-save-modal');
+    const cancelSaveBtn = document.getElementById('cancel-save-btn');
+    const confirmSaveBtn = document.getElementById('confirm-save-btn');
+    const diagramTitleInput = document.getElementById('diagram-title');
+    const loadModal = document.getElementById('load-modal');
+    const closeLoadModalBtn = document.getElementById('close-load-modal');
+    const diagramList = document.getElementById('diagram-list');
+
+    // Auth Functions
+    function updateAuthUI(user) {
+        if (user) {
+            loginBtn.style.display = 'none';
+            userProfile.style.display = 'flex';
+            userAvatar.src = user.photoURL || 'https://via.placeholder.com/32';
+            userName.textContent = user.displayName || user.email;
+            cloudBtns.style.display = '';
+        } else {
+            loginBtn.style.display = 'inline-flex';
+            userProfile.style.display = 'none';
+            cloudBtns.style.display = 'none';
+        }
+    }
+
+    // Event Listeners
+    loginBtn.addEventListener('click', () => {
+        loginModal.classList.add('show');
+    });
+
+    closeLoginModalBtn.addEventListener('click', () => {
+        loginModal.classList.remove('show');
+    });
+
+    // Close modals when clicking outside
+    window.addEventListener('click', (e) => {
+        if (e.target === loginModal) loginModal.classList.remove('show');
+        if (e.target === saveModal) saveModal.classList.remove('show');
+        if (e.target === loadModal) loadModal.classList.remove('show');
+    });
+
+    googleLoginBtn.addEventListener('click', async () => {
+        try {
+            await firebaseManager.loginWithGoogle();
+            loginModal.classList.remove('show');
+            showToast('Logged in with Google successfully!');
+        } catch (error) {
+            showToast('Login failed: ' + error.message, true);
+        }
+    });
+
+    logoutBtn.addEventListener('click', async () => {
+        try {
+            await firebaseManager.logout();
+            showToast('Logged out successfully!');
+        } catch (error) {
+            showToast('Logout failed: ' + error.message, true);
+        }
+    });
+
+    // Cloud Save
+    cloudSaveBtn.addEventListener('click', () => {
+        saveModal.classList.add('show');
+        diagramTitleInput.focus();
+    });
+
+    closeSaveModalBtn.addEventListener('click', () => saveModal.classList.remove('show'));
+    cancelSaveBtn.addEventListener('click', () => saveModal.classList.remove('show'));
+
+    confirmSaveBtn.addEventListener('click', async () => {
+        const title = diagramTitleInput.value.trim();
+        if (!title) {
+            showToast('Please enter a diagram name.', true);
+            return;
+        }
+
+        const code = editor.getValue();
+        try {
+            confirmSaveBtn.disabled = true;
+            confirmSaveBtn.textContent = 'Saving...';
+            await firebaseManager.saveDiagram(title, code);
+            saveModal.classList.remove('show');
+            diagramTitleInput.value = '';
+            showToast('Diagram saved to cloud!');
+        } catch (error) {
+            showToast('Failed to save: ' + error.message, true);
+        } finally {
+            confirmSaveBtn.disabled = false;
+            confirmSaveBtn.textContent = 'Save';
+        }
+    });
+
+    // Cloud Load
+    cloudLoadBtn.addEventListener('click', async () => {
+        loadModal.classList.add('show');
+        await loadDiagrams();
+    });
+
+    closeLoadModalBtn.addEventListener('click', () => loadModal.classList.remove('show'));
+
+    async function loadDiagrams() {
+        diagramList.innerHTML = '<div class="loading-spinner">Loading...</div>';
+        try {
+            const diagrams = await firebaseManager.getUserDiagrams();
+
+            if (diagrams.length === 0) {
+                diagramList.innerHTML = '<div class="loading-spinner">No diagrams found.</div>';
+                return;
+            }
+
+            diagramList.innerHTML = '';
+            diagrams.forEach(diagram => {
+                const item = document.createElement('div');
+                item.className = 'diagram-item';
+
+                const date = diagram.createdAt ? new Date(diagram.createdAt.seconds * 1000).toLocaleDateString() : 'Unknown date';
+
+                item.innerHTML = `
+                    <div class="diagram-info">
+                        <h3>${escapeHtml(diagram.title)}</h3>
+                        <div class="diagram-meta">Last modified: ${date}</div>
+                    </div>
+                    <div class="diagram-actions">
+                        <button class="btn btn-sm btn-primary load-btn" data-id="${diagram.id}">Load</button>
+                    </div>
+                `;
+
+                // Store code in data attribute or closure
+                item.querySelector('.load-btn').addEventListener('click', () => {
+                    editor.setValue(diagram.code);
+                    loadModal.classList.remove('show');
+                    showToast(`Loaded "${diagram.title}"`);
+                });
+
+                diagramList.appendChild(item);
+            });
+        } catch (error) {
+            diagramList.innerHTML = `<div class="loading-spinner" style="color: red;">Error: ${error.message}</div>`;
+        }
+    }
+
+    // Helper for toast notifications (simple implementation)
+    function showToast(message, isError = false) {
+        const toast = document.getElementById('toast-notification');
+        if (!toast) return; // Ensure toast element exists in HTML if not already
+
+        // Create toast if it doesn't exist or use existing logic
+        // For now, let's assume a simple toast div exists or we create one
+        toast.textContent = message;
+        toast.style.backgroundColor = isError ? '#dc3545' : '#28a745';
+        toast.style.color = 'white';
+        toast.style.padding = '10px 20px';
+        toast.style.borderRadius = '4px';
+        toast.style.position = 'fixed';
+        toast.style.bottom = '20px';
+        toast.style.right = '20px';
+        toast.style.zIndex = '2000';
+        toast.style.display = 'block';
+        toast.style.opacity = '1';
+        toast.style.transition = 'opacity 0.3s';
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 300);
+        }, 3000);
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
 });
