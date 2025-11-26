@@ -781,6 +781,65 @@ body.dark-mode .form-input::placeholder {
     min-width: 80px;
 }
 
+/* Save Modal Specific Styles */
+.save-input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.save-input-row .form-input {
+    flex: 1;
+}
+
+.save-input-row .btn {
+    white-space: nowrap;
+    height: 46px;
+}
+
+.save-existing-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .save-existing-section {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.save-existing-section > label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary-light);
+    margin-bottom: 12px;
+}
+
+body.dark-mode .save-existing-section > label {
+    color: var(--text-secondary-dark);
+}
+
+.save-diagram-list {
+    max-height: 200px;
+}
+
+.save-diagram-list .diagram-item {
+    padding: 10px 12px;
+}
+
+.save-diagram-list .diagram-item:hover {
+    background: rgba(86, 171, 47, 0.08);
+}
+
+body.dark-mode .save-diagram-list .diagram-item:hover {
+    background: rgba(86, 171, 47, 0.15);
+}
+
+.save-diagram-list .update-btn {
+    font-size: 11px;
+    padding: 4px 10px;
+}
+
 @media (max-width: 600px) {
     .modal-compact {
         max-width: 100%;
@@ -794,6 +853,14 @@ body.dark-mode .form-input::placeholder {
 
     .diagram-item-actions {
         opacity: 1;
+    }
+    
+    .save-input-row {
+        flex-direction: column;
+    }
+    
+    .save-input-row .btn {
+        width: 100%;
     }
 }
 

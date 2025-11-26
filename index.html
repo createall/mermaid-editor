@@ -474,16 +474,32 @@ sequenceDiagram
 
     <!-- Save Diagram Modal -->
     <div id="save-modal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content modal-compact">
             <button class="modal-close" id="close-save-modal">&times;</button>
             <h2>Save Diagram</h2>
+            
+            <!-- New Diagram Input -->
             <div class="form-group">
-                <label for="diagram-title">Diagram Name</label>
-                <input type="text" id="diagram-title" placeholder="Enter a name for your diagram" class="form-input">
+                <label for="diagram-title">New Diagram Name</label>
+                <div class="save-input-row">
+                    <input type="text" id="diagram-title" placeholder="Enter a name for new diagram" class="form-input">
+                    <button id="confirm-save-btn" class="btn btn-primary">Save New</button>
+                </div>
             </div>
+            
+            <!-- Existing Diagrams List -->
+            <div class="save-existing-section">
+                <label>Or update existing diagram</label>
+                <div id="save-diagram-list" class="diagram-list save-diagram-list">
+                    <div class="diagram-loading">
+                        <div class="loading-spinner"></div>
+                        <span>Loading diagrams...</span>
+                    </div>
+                </div>
+            </div>
+            
             <div class="modal-actions">
                 <button id="cancel-save-btn" class="btn btn-secondary">Cancel</button>
-                <button id="confirm-save-btn" class="btn btn-primary">Save</button>
             </div>
         </div>
     </div>

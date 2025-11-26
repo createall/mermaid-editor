@@ -284,14 +284,74 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Cloud Save
-    cloudSaveBtn.addEventListener('click', () => {
+    const saveDiagramList = document.getElementById('save-diagram-list');
+    
+    cloudSaveBtn.addEventListener('click', async () => {
         saveModal.classList.add('show');
+        diagramTitleInput.value = '';
         diagramTitleInput.focus();
+        await loadSaveDiagrams();
     });
 
     closeSaveModalBtn.addEventListener('click', () => saveModal.classList.remove('show'));
     cancelSaveBtn.addEventListener('click', () => saveModal.classList.remove('show'));
 
+    // Load diagrams for save modal
+    async function loadSaveDiagrams() {
+        saveDiagramList.innerHTML = '<div class="diagram-loading"><div class="loading-spinner"></div><span>Loading...</span></div>';
+        try {
+            const diagrams = await firebaseManager.getUserDiagrams();
+
+            if (diagrams.length === 0) {
+                saveDiagramList.innerHTML = '<div class="diagram-empty-text">No existing diagrams</div>';
+                return;
+            }
+
+            saveDiagramList.innerHTML = '';
+            diagrams.forEach(diagram => {
+                const item = document.createElement('div');
+                item.className = 'diagram-item save-item';
+
+                const date = diagram.updatedAt ? new Date(diagram.updatedAt.seconds * 1000).toLocaleDateString() : 'Unknown date';
+                item.innerHTML = `
+                    <div class="diagram-item-info">
+                        <div class="diagram-item-title">${escapeHtml(diagram.title)}</div>
+                        <div class="diagram-item-date">${date}</div>
+                    </div>
+                    <div class="diagram-item-actions">
+                        <button class="update-btn btn btn-sm btn-secondary" data-id="${diagram.id}" data-title="${escapeHtml(diagram.title)}">Update</button>
+                    </div>
+                `;
+
+                item.querySelector('.update-btn').addEventListener('click', async (e) => {
+                    const btn = e.target;
+                    const diagramId = btn.dataset.id;
+                    const diagramTitle = btn.dataset.title;
+                    
+                    const code = editor.getValue();
+                    try {
+                        btn.disabled = true;
+                        btn.textContent = 'Updating...';
+                        await firebaseManager.updateDiagram(diagramId, code);
+                        saveModal.classList.remove('show');
+                        showToast(`"${diagramTitle}" updated!`);
+                    } catch (error) {
+                        showToast('Failed to update: ' + error.message, true);
+                    } finally {
+                        btn.disabled = false;
+                        btn.textContent = 'Update';
+                    }
+                });
+
+                saveDiagramList.appendChild(item);
+            });
+        } catch (error) {
+            saveDiagramList.innerHTML = '<div class="diagram-empty-text">Failed to load diagrams</div>';
+            console.error('Error loading diagrams:', error);
+        }
+    }
+
+    // Save new diagram
     confirmSaveBtn.addEventListener('click', async () => {
         const title = diagramTitleInput.value.trim();
         if (!title) {
@@ -311,7 +371,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             showToast('Failed to save: ' + error.message, true);
         } finally {
             confirmSaveBtn.disabled = false;
-            confirmSaveBtn.textContent = 'Save';
+            confirmSaveBtn.textContent = 'Save New';
         }
     });
 

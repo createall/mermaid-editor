@@ -1,6 +1,6 @@
 import { auth, db, googleProvider, githubProvider } from './firebase-config.js';
 import { signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, addDoc, query, where, getDocs, orderBy, serverTimestamp, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, addDoc, query, where, getDocs, orderBy, serverTimestamp, doc, getDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 export class FirebaseManager {
     constructor(onAuthChange) {
@@ -95,6 +95,23 @@ export class FirebaseManager {
             return true;
         } catch (e) {
             console.error("Error deleting document: ", e);
+            throw e;
+        }
+    }
+
+    async updateDiagram(diagramId, code) {
+        if (!this.user) throw new Error("User not authenticated");
+
+        try {
+            const docRef = doc(db, "diagrams", diagramId);
+            await updateDoc(docRef, {
+                code: code,
+                updatedAt: serverTimestamp()
+            });
+            console.log("Document updated with ID: ", diagramId);
+            return diagramId;
+        } catch (e) {
+            console.error("Error updating document: ", e);
             throw e;
         }
     }
