@@ -260,7 +260,41 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (e.target === loginModal) loginModal.classList.remove('show');
         if (e.target === saveModal) saveModal.classList.remove('show');
         if (e.target === loadModal) loadModal.classList.remove('show');
+        if (e.target === previewModal) previewModal.classList.remove('show');
     });
+
+    // Preview Modal Elements
+    const previewModal = document.getElementById('preview-modal');
+    const closePreviewModalBtn = document.getElementById('close-preview-modal');
+    const previewTitle = document.getElementById('preview-title');
+    const previewImage = document.getElementById('preview-image');
+    const previewImageContainer = document.getElementById('preview-image-container');
+
+    closePreviewModalBtn.addEventListener('click', () => {
+        previewModal.classList.remove('show');
+    });
+
+    // Show thumbnail preview
+    function showThumbnailPreview(thumbnail, title) {
+        if (thumbnail) {
+            previewTitle.textContent = title || 'Diagram Preview';
+            previewImage.src = thumbnail;
+            previewImage.style.display = 'block';
+            previewImageContainer.innerHTML = '';
+            previewImageContainer.appendChild(previewImage);
+        } else {
+            previewTitle.textContent = title || 'Diagram Preview';
+            previewImageContainer.innerHTML = `
+                <div class="preview-no-image">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                    </svg>
+                    <span>No preview available</span>
+                </div>
+            `;
+        }
+        previewModal.classList.add('show');
+    }
 
     googleLoginBtn.addEventListener('click', async () => {
         try {
@@ -313,7 +347,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 item.className = 'diagram-item save-item';
 
                 const date = diagram.updatedAt ? new Date(diagram.updatedAt.seconds * 1000).toLocaleDateString() : 'Unknown date';
+                
+                // Thumbnail HTML for save modal
+                const thumbnailHtml = diagram.thumbnail 
+                    ? `<img src="${diagram.thumbnail}" alt="Preview" class="diagram-thumbnail diagram-thumbnail-sm">`
+                    : `<div class="diagram-thumbnail-placeholder diagram-thumbnail-sm">
+                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                           <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5z"/>
+                         </svg>
+                       </div>`;
+                
                 item.innerHTML = `
+                    ${thumbnailHtml}
                     <div class="diagram-item-info">
                         <div class="diagram-item-title">${escapeHtml(diagram.title)}</div>
                         <div class="diagram-item-date">${date}</div>
@@ -329,10 +374,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const diagramTitle = btn.dataset.title;
                     
                     const code = editor.getValue();
+                    const thumbnail = createThumbnail();
                     try {
                         btn.disabled = true;
                         btn.textContent = 'Updating...';
-                        await firebaseManager.updateDiagram(diagramId, code);
+                        await firebaseManager.updateDiagram(diagramId, code, thumbnail);
                         saveModal.classList.remove('show');
                         showToast(`"${diagramTitle}" updated!`);
                     } catch (error) {
@@ -342,6 +388,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                         btn.textContent = 'Update';
                     }
                 });
+
+                // Thumbnail click handler for preview in save modal
+                const thumbnailEl = item.querySelector('.diagram-thumbnail, .diagram-thumbnail-placeholder');
+                if (thumbnailEl) {
+                    thumbnailEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        showThumbnailPreview(diagram.thumbnail, diagram.title);
+                    });
+                }
 
                 saveDiagramList.appendChild(item);
             });
@@ -360,10 +415,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const code = editor.getValue();
+        const thumbnail = createThumbnail();
         try {
             confirmSaveBtn.disabled = true;
             confirmSaveBtn.textContent = 'Saving...';
-            await firebaseManager.saveDiagram(title, code);
+            await firebaseManager.saveDiagram(title, code, thumbnail);
             saveModal.classList.remove('show');
             diagramTitleInput.value = '';
             showToast('Diagram saved to cloud!');
@@ -399,8 +455,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 item.className = 'diagram-item';
 
                 const date = diagram.createdAt ? new Date(diagram.createdAt.seconds * 1000).toLocaleDateString() : 'Unknown date';
-                // btn btn-sm btn-primary load-btn
+                
+                // Thumbnail HTML
+                const thumbnailHtml = diagram.thumbnail 
+                    ? `<img src="${diagram.thumbnail}" alt="Preview" class="diagram-thumbnail">`
+                    : `<div class="diagram-thumbnail-placeholder">
+                         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                           <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5z"/>
+                         </svg>
+                       </div>`;
+                
                 item.innerHTML = `
+                    ${thumbnailHtml}
                     <div class="diagram-item-info">
                         <div class="diagram-item-title">${escapeHtml(diagram.title)}</div>
                         <div class="diagram-item-date">${date}</div>
@@ -422,6 +488,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     loadModal.classList.remove('show');
                     showToast(`Loaded "${diagram.title}"`);
                 });
+
+                // Thumbnail click handler for preview
+                const thumbnailEl = item.querySelector('.diagram-thumbnail, .diagram-thumbnail-placeholder');
+                if (thumbnailEl) {
+                    thumbnailEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        showThumbnailPreview(diagram.thumbnail, diagram.title);
+                    });
+                }
 
                 // Delete button handler
                 item.querySelector('.delete-btn').addEventListener('click', async (e) => {
@@ -460,5 +535,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    // Generate SVG thumbnail as Base64
+    function createThumbnail() {
+        const diagramContainer = document.getElementById('mermaid-diagram');
+        const svgElement = diagramContainer.querySelector('svg');
+        
+        if (!svgElement) {
+            return null;
+        }
+
+        try {
+            // Clone SVG to avoid modifying the original
+            const clonedSvg = svgElement.cloneNode(true);
+            
+            // Set a fixed viewBox for consistent thumbnail size
+            const bbox = svgElement.getBBox();
+            clonedSvg.setAttribute('viewBox', `${bbox.x - 10} ${bbox.y - 10} ${bbox.width + 20} ${bbox.height + 20}`);
+            clonedSvg.setAttribute('width', '600');
+            clonedSvg.setAttribute('height', '450');
+            clonedSvg.style.background = 'white';
+
+            // Serialize SVG to string
+            const serializer = new XMLSerializer();
+            const svgString = serializer.serializeToString(clonedSvg);
+            
+            // Convert to Base64
+            const base64 = btoa(unescape(encodeURIComponent(svgString)));
+            return `data:image/svg+xml;base64,${base64}`;
+        } catch (error) {
+            console.error('Error creating thumbnail:', error);
+            return null;
+        }
     }
 });

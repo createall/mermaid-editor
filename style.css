@@ -556,6 +556,7 @@ body.dark-mode .diagram-list::-webkit-scrollbar-thumb:hover {
     border-left: 3px solid var(--primary-color);
     transition: all 0.15s ease;
     cursor: pointer;
+    gap: 12px;
 }
 
 .diagram-item:hover {
@@ -569,6 +570,141 @@ body.dark-mode .diagram-item {
 
 body.dark-mode .diagram-item:hover {
     background: rgba(255, 255, 255, 0.08);
+}
+
+/* Diagram Thumbnail */
+.diagram-thumbnail {
+    width: 60px;
+    height: 45px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+body.dark-mode .diagram-thumbnail {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.diagram-thumbnail-placeholder {
+    width: 60px;
+    height: 45px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px dashed rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--text-secondary-light);
+}
+
+body.dark-mode .diagram-thumbnail-placeholder {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: var(--text-secondary-dark);
+}
+
+/* Small thumbnail for save modal */
+.diagram-thumbnail-sm {
+    width: 40px;
+    height: 30px;
+}
+
+.diagram-thumbnail-sm svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Clickable thumbnail */
+.diagram-thumbnail,
+.diagram-thumbnail-placeholder {
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.diagram-thumbnail:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.diagram-thumbnail-placeholder:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+body.dark-mode .diagram-thumbnail:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .diagram-thumbnail-placeholder:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Thumbnail Preview Modal */
+.modal-preview {
+    max-width: 90vw;
+    max-height: 90vh;
+    width: auto;
+    padding: 24px;
+}
+
+.modal-preview h2 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary-light);
+    padding-right: 40px;
+}
+
+body.dark-mode .modal-preview h2 {
+    color: var(--text-primary-dark);
+}
+
+.preview-image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    min-width: 600px;
+    min-height: 450px;
+    max-width: 85vw;
+    max-height: 80vh;
+    overflow: auto;
+}
+
+body.dark-mode .preview-image-container {
+    background: #f5f5f5;
+}
+
+.preview-image-container img {
+    max-width: 100%;
+    max-height: 75vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    transform: scale(1);
+    transform-origin: center;
+}
+
+.preview-no-image {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--text-secondary-light);
+    padding: 40px;
+}
+
+.preview-no-image svg {
+    opacity: 0.5;
+}
+
+body.dark-mode .preview-no-image {
+    color: var(--text-secondary-dark);
 }
 
 .diagram-item-info {

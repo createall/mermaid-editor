@@ -45,7 +45,7 @@ export class FirebaseManager {
         }
     }
 
-    async saveDiagram(title, code) {
+    async saveDiagram(title, code, thumbnail = null) {
         if (!this.user) throw new Error("User not authenticated");
 
         try {
@@ -53,6 +53,7 @@ export class FirebaseManager {
                 uid: this.user.uid,
                 title: title,
                 code: code,
+                thumbnail: thumbnail,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             });
@@ -99,15 +100,19 @@ export class FirebaseManager {
         }
     }
 
-    async updateDiagram(diagramId, code) {
+    async updateDiagram(diagramId, code, thumbnail = null) {
         if (!this.user) throw new Error("User not authenticated");
 
         try {
             const docRef = doc(db, "diagrams", diagramId);
-            await updateDoc(docRef, {
+            const updateData = {
                 code: code,
                 updatedAt: serverTimestamp()
-            });
+            };
+            if (thumbnail) {
+                updateData.thumbnail = thumbnail;
+            }
+            await updateDoc(docRef, updateData);
             console.log("Document updated with ID: ", diagramId);
             return diagramId;
         } catch (e) {
