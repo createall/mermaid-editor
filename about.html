@@ -114,8 +114,8 @@
         
         <p>
             A modern, web-based tool for creating beautiful diagrams using <a href="https://mermaid.js.org/" target="_blank">Mermaid.js</a>. 
-            This editor provides a professional development environment with real-time rendering, advanced export options, 
-            and a seamless user experience across all devices.
+            This editor provides a professional development environment with real-time rendering, cloud storage, 
+            intelligent autocomplete, and a seamless user experience across all devices.
         </p>
 
         <h2>✨ Key Features</h2>
@@ -126,8 +126,8 @@
                 <ul>
                     <li>Syntax highlighting with YAML support</li>
                     <li>9 beautiful editor themes</li>
+                    <li>Smart autocomplete for Mermaid syntax</li>
                     <li>Line numbers & bracket matching</li>
-                    <li>Smart auto-indentation</li>
                     <li>Active line highlighting</li>
                 </ul>
             </div>
@@ -139,7 +139,29 @@
                     <li>Adjustable split-view layout</li>
                     <li>Zoom & pan navigation</li>
                     <li>Keyboard shortcuts for control</li>
-                    <li>Background pattern options</li>
+                    <li>Background pattern options (dots, grid, blank)</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>☁️ Cloud Storage</h3>
+                <ul>
+                    <li>Sign in with Google account</li>
+                    <li>Save diagrams to cloud</li>
+                    <li>Access from anywhere</li>
+                    <li>Manage & delete saved diagrams</li>
+                    <li>Powered by Firebase</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h3>💾 Save & Share</h3>
+                <ul>
+                    <li>Auto-save to local storage</li>
+                    <li>Shareable diagram URLs</li>
+                    <li>Export as PNG, JPG, SVG, PDF</li>
+                    <li>Copy to clipboard</li>
+                    <li>Save/load code files (.txt, .mmd)</li>
                 </ul>
             </div>
 
@@ -154,17 +176,6 @@
             </div>
 
             <div class="feature-card">
-                <h3>💾 Save & Share</h3>
-                <ul>
-                    <li>Auto-save to local storage</li>
-                    <li>Shareable diagram URLs</li>
-                    <li>Export as PNG, JPG, SVG, PDF</li>
-                    <li>Copy to clipboard</li>
-                    <li>Save/load code files</li>
-                </ul>
-            </div>
-
-            <div class="feature-card">
                 <h3>🎯 Theme Support</h3>
                 <ul>
                     <li>Dark & light modes</li>
@@ -173,14 +184,43 @@
                     <li>Customizable backgrounds</li>
                 </ul>
             </div>
+        </div>
 
+        <h2>📊 Supported Diagram Types</h2>
+        <p>Create 22+ types of diagrams with sample templates:</p>
+        <div class="feature-grid">
             <div class="feature-card">
-                <h3>🚀 Performance</h3>
                 <ul>
-                    <li>Zero build process required</li>
-                    <li>Fast rendering engine</li>
-                    <li>Optimized for large diagrams</li>
-                    <li>Smart SVG handling</li>
+                    <li>Flowchart</li>
+                    <li>Sequence Diagram</li>
+                    <li>Class Diagram</li>
+                    <li>State Diagram</li>
+                    <li>Entity Relationship</li>
+                    <li>User Journey</li>
+                    <li>Gantt Chart</li>
+                    <li>Pie Chart</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <ul>
+                    <li>Quadrant Chart</li>
+                    <li>Requirement Diagram</li>
+                    <li>GitGraph</li>
+                    <li>C4 Diagram</li>
+                    <li>Mindmaps</li>
+                    <li>Timeline</li>
+                    <li>Sankey Diagram</li>
+                    <li>XY Chart</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <ul>
+                    <li>Block Diagram</li>
+                    <li>Packet Diagram</li>
+                    <li>Kanban Board</li>
+                    <li>Architecture Diagram</li>
+                    <li>Radar Chart</li>
+                    <li>Treemap</li>
                 </ul>
             </div>
         </div>
@@ -228,8 +268,9 @@
 
         <h2>🔧 Technical Stack</h2>
         <ul>
-            <li><strong>Mermaid.js</strong> - Powerful diagram generation library</li>
-            <li><strong>CodeMirror</strong> - Professional code editor component</li>
+            <li><strong>Mermaid.js v11</strong> - Powerful diagram generation library</li>
+            <li><strong>CodeMirror 5</strong> - Professional code editor component</li>
+            <li><strong>Firebase</strong> - Authentication & cloud storage</li>
             <li><strong>Split.js</strong> - Resizable split-view panels</li>
             <li><strong>svg-pan-zoom</strong> - Interactive diagram navigation</li>
             <li><strong>jsPDF</strong> - PDF generation for exports</li>
@@ -243,6 +284,14 @@
             <li>Firefox</li>
             <li>Safari</li>
             <li>Mobile browsers (iOS Safari, Chrome Mobile)</li>
+        </ul>
+
+        <h2>🚀 Performance</h2>
+        <ul>
+            <li>Zero build process required</li>
+            <li>Fast rendering engine</li>
+            <li>Optimized autocomplete (no flickering)</li>
+            <li>Smart SVG handling for large diagrams</li>
         </ul>
 
         <h2>📄 License</h2>

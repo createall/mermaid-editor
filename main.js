@@ -339,14 +339,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 item.className = 'diagram-item';
 
                 const date = diagram.createdAt ? new Date(diagram.createdAt.seconds * 1000).toLocaleDateString() : 'Unknown date';
-
+                // btn btn-sm btn-primary load-btn
                 item.innerHTML = `
-                    <div class="diagram-info">
-                        <h3>${escapeHtml(diagram.title)}</h3>
-                        <div class="diagram-meta">Last modified: ${date}</div>
+                    <div class="diagram-item-info">
+                        <div class="diagram-item-title">${escapeHtml(diagram.title)}</div>
+                        <div class="diagram-item-date">${date}</div>
                     </div>
-                    <div class="diagram-actions">
-                        <button class="btn btn-sm btn-primary load-btn" data-id="${diagram.id}">Load</button>
+                    <div class="diagram-item-actions">
+                        <button class="load-btn btn btn-sm btn-primary" data-id="${diagram.id}">Load</button>
+                        <button class="diagram-item-btn delete-btn" data-id="${diagram.id}" title="Delete diagram">
+                            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                            </svg>
+                        </button>
                     </div>
                 `;
 
@@ -355,6 +361,32 @@ document.addEventListener('DOMContentLoaded', async () => {
                     editor.setValue(diagram.code);
                     loadModal.classList.remove('show');
                     showToast(`Loaded "${diagram.title}"`);
+                });
+
+                // Delete button handler
+                item.querySelector('.delete-btn').addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    if (confirm(`Are you sure you want to delete "${diagram.title}"?`)) {
+                        try {
+                            await firebaseManager.deleteDiagram(diagram.id);
+                            item.remove();
+                            showToast(`Deleted "${diagram.title}"`);
+                            
+                            // Check if list is empty
+                            if (diagramList.children.length === 0) {
+                                diagramList.innerHTML = `
+                                    <div class="diagram-empty">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5z"/>
+                                        </svg>
+                                        <span class="diagram-empty-text">No diagrams saved yet</span>
+                                    </div>
+                                `;
+                            }
+                        } catch (error) {
+                            showToast(`Error: ${error.message}`, 'error');
+                        }
+                    }
                 });
 
                 diagramList.appendChild(item);

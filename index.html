@@ -24,7 +24,7 @@
     <header class="app-header">
         <div class="header-content">
             <div class="logo">
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" class="icon">
                     <circle cx="20" cy="20" r="18" fill="url(#gradient1)" />
                     <path d="M20 8L28 16L20 24L12 16L20 8Z" fill="white" opacity="0.9" />
                     <path d="M20 16L28 24L20 32L12 24L20 16Z" fill="white" opacity="0.6" />
@@ -36,8 +36,15 @@
                     </defs>
                 </svg>
                 <div class="title-group">
-                    <h1><a href="about.html" style="color: inherit; text-decoration: none;">Mermaid Diagram Editor</a>
-                    </h1>
+                    <div class="title-row">
+                        <h1><a href="about.html" style="color: inherit; text-decoration: none;">Mermaid Diagram Editor</a></h1>
+                        <a href="about.html" class="help-badge" title="About this editor">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                            </svg>
+                        </a>
+                    </div>
                     <p class="subtitle">Create beautiful diagrams with ease</p>
                 </div>
             </div>
@@ -481,12 +488,20 @@ sequenceDiagram
 
     <!-- Load Diagram Modal -->
     <div id="load-modal" class="modal">
-        <div class="modal-content modal-lg">
+        <div class="modal-content modal-compact">
             <button class="modal-close" id="close-load-modal">&times;</button>
-            <h2>My Diagrams</h2>
+            <div class="load-modal-header">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13 0v6h2v-6h-2zm-4 4v2h2v-2h-2zm4 0v2h2v-2h-2zm0-4v2h2v-2h-2zm-4 0v2h2v-2h-2z"/>
+                </svg>
+                <h2>My Diagrams</h2>
+            </div>
             <div id="diagram-list" class="diagram-list">
                 <!-- Diagrams will be populated here -->
-                <div class="loading-spinner">Loading...</div>
+                <div class="diagram-loading">
+                    <div class="loading-spinner"></div>
+                    <span>Loading diagrams...</span>
+                </div>
             </div>
         </div>
     </div>
