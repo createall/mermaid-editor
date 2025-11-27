@@ -9,11 +9,11 @@ let panZoomInstance = null;
 export const initializeMermaid = (isDarkMode) => {
     window.mermaid.initialize({
         startOnLoad: false,
-        securityLevel: 'strict',
+        securityLevel: 'loose',
         suppressErrors: true,
         theme: isDarkMode ? 'dark' : 'default',
         flowchart: {
-            htmlLabels: false,
+            htmlLabels: true,
             useMaxWidth: false
         },
         gantt: {
