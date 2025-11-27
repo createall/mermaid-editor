@@ -280,10 +280,10 @@ export const setupKeyboardShortcuts = () => {
 
                 switch (e.key) {
                     case 'i':
-                        panZoomInstance.pan({ x: pan.x, y: pan.y + panStep });
+                        panZoomInstance.pan({ x: pan.x, y: pan.y - panStep });
                         break;
                     case 'k':
-                        panZoomInstance.pan({ x: pan.x, y: pan.y - panStep });
+                        panZoomInstance.pan({ x: pan.x, y: pan.y + panStep });
                         break;
                     case 'j':
                         panZoomInstance.pan({ x: pan.x - panStep, y: pan.y });
