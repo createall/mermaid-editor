@@ -1287,6 +1287,7 @@ body.dark-mode .zoom-level {
     overflow: hidden;
     background-position: 0 0;
     transition: background-image var(--transition-base);
+    touch-action: manipulation;
 }
 
 .editor-wrapper {
