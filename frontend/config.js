@@ -10,7 +10,7 @@ export const CONFIG = {
     PADDING: 20,
     LOAD_TIMEOUT: 10000,
     MAX_DIMENSION: 16384,
-    DEFAULT_SPLIT_SIZES: [50, 50],
+    DEFAULT_SPLIT_SIZES: [35, 65],
     MESSAGES: {
         URL_COPIED: 'Share URL copied to clipboard!',
         URL_COPY_FAILED: 'Failed to copy URL.',

@@ -12,13 +12,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Deploy to Server
+    - name: Deploy Frontend to Server
       uses: easingthemes/ssh-deploy@v4
       with:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
         REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
         REMOTE_USER: ${{ secrets.REMOTE_USER }}
-        SOURCE: "./"
+        SOURCE: "frontend/"
         TARGET: "/var/www/mermaid-editor/"
-        EXCLUDE: ".git, .github, README.md, LICENSE"
+        EXCLUDE: ".git, .github"

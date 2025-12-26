@@ -1,7 +1,7 @@
 import { CONFIG, getMermaidHints } from './config.js';
 import { debounce, ensureDiagramVisible, showToast } from './utils.js';
 import { initializeMermaid, renderDiagram, applyDarkMode } from './diagram.js';
-import { FirebaseManager } from './firebase-manager.js';
+import { BackendAPI } from './backend-api.js';
 import {
     setupUrlCodeLoading,
     setupCopyUrlButton,
@@ -145,10 +145,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initial render
     await renderCallback();
 
-    // --- Firebase Integration ---
-    const firebaseManager = new FirebaseManager((user) => {
-        updateAuthUI(user);
-    });
+    // --- Backend API Integration ---
+    const backendAPI = new BackendAPI();
 
     // Auth UI Elements
     const avatarBtn = document.getElementById('avatar-btn');
@@ -178,6 +176,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const loadModal = document.getElementById('load-modal');
     const closeLoadModalBtn = document.getElementById('close-load-modal');
     const diagramList = document.getElementById('diagram-list');
+
+    // Handle OAuth callback if present
+    if (backendAPI.handleOAuthCallback()) {
+        showToast('Logged in successfully!');
+    }
+
+    // Initialize auth state
+    if (backendAPI.isAuthenticated()) {
+        const user = await backendAPI.getCurrentUser();
+        updateAuthUI(user);
+    }
 
     // Toggle menu
     avatarBtn.addEventListener('click', () => {
@@ -209,24 +218,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     function updateAuthUI(user) {
         if (user) {
             loginBtn.style.display = 'none';
-            userName.textContent = user.displayName || user.email;
+            userName.textContent = user.display_name || user.email;
             cloudBtns.style.display = '';
             avatarBtn.classList.add('logged-in');
-            if (user.photoURL) {
-                userAvatar.src = user.photoURL;
+            if (user.photo_url) {
+                userAvatar.src = user.photo_url;
                 userAvatarName.style.display = 'none';
                 avatarInitialsImg.style.display = '';
                 avatarInitialsImg.style.width = '32px';
                 avatarInitialsImg.style.height = '32px';
-                avatarInitialsImg.src = user.photoURL;
+                avatarInitialsImg.src = user.photo_url;
                 avatarInitials.style.display = 'none';
             } else {
                 userAvatar.style.display = 'none';
-                userAvatarName.textContent = user.displayName;
+                userAvatarName.textContent = user.display_name;
                 avatarInitialsImg.style.display = 'none';
                 avatarInitialsImg.src = '';
                 avatarInitials.style.display = '';
-                avatarInitials.textContent = user.displayName;
+                avatarInitials.textContent = user.display_name;
             }
             loggedInView.style.display = 'block';
             loggedOutView.style.display = 'none';
@@ -294,9 +303,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     googleLoginBtn.addEventListener('click', async () => {
         try {
-            await firebaseManager.loginWithGoogle();
-            loginModal.classList.remove('show');
-            showToast('Logged in with Google successfully!');
+            await backendAPI.loginWithGoogle();
+            // User will be redirected to Google OAuth, then back to app
         } catch (error) {
             showToast('Login failed: ' + error.message, true);
         }
@@ -304,7 +312,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     logoutBtn.addEventListener('click', async () => {
         try {
-            await firebaseManager.logout();
+            await backendAPI.logout();
+            updateAuthUI(null);
             showToast('Logged out successfully!');
             avatarMenu.classList.remove('show');
             avatarMenu.setAttribute('aria-hidden', 'true');
@@ -330,7 +339,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function loadSaveDiagrams() {
         saveDiagramList.innerHTML = '<div class="diagram-loading"><div class="loading-spinner"></div><span>Loading...</span></div>';
         try {
-            const diagrams = await firebaseManager.getUserDiagrams();
+            const diagrams = await backendAPI.getDiagrams();
 
             if (diagrams.length === 0) {
                 saveDiagramList.innerHTML = '<div class="diagram-empty-text">No existing diagrams</div>';
@@ -342,7 +351,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const item = document.createElement('div');
                 item.className = 'diagram-item save-item';
 
-                const date = diagram.updatedAt ? new Date(diagram.updatedAt.seconds * 1000).toLocaleDateString() : 'Unknown date';
+                const date = diagram.updated_at ? new Date(diagram.updated_at).toLocaleDateString() : 'Unknown date';
                 
                 // Thumbnail HTML for save modal
                 const thumbnailHtml = diagram.thumbnail 
@@ -374,7 +383,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     try {
                         btn.disabled = true;
                         btn.textContent = 'Updating...';
-                        await firebaseManager.updateDiagram(diagramId, code, thumbnail);
+                        await backendAPI.updateDiagram(diagramId, { code, thumbnail });
                         saveModal.classList.remove('show');
                         showToast(`"${diagramTitle}" updated!`);
                     } catch (error) {
@@ -415,7 +424,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             confirmSaveBtn.disabled = true;
             confirmSaveBtn.textContent = 'Saving...';
-            await firebaseManager.saveDiagram(title, code, thumbnail);
+            await backendAPI.createDiagram(title, code, thumbnail);
             saveModal.classList.remove('show');
             diagramTitleInput.value = '';
             showToast('Diagram saved to cloud!');
@@ -438,7 +447,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function loadDiagrams() {
         diagramList.innerHTML = '<div class="loading-spinner">Loading...</div>';
         try {
-            const diagrams = await firebaseManager.getUserDiagrams();
+            const diagrams = await backendAPI.getDiagrams();
 
             if (diagrams.length === 0) {
                 diagramList.innerHTML = '<div class="loading-spinner">No diagrams found.</div>';
@@ -450,7 +459,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const item = document.createElement('div');
                 item.className = 'diagram-item';
 
-                const date = diagram.createdAt ? new Date(diagram.createdAt.seconds * 1000).toLocaleDateString() : 'Unknown date';
+                const date = diagram.created_at ? new Date(diagram.created_at).toLocaleDateString() : 'Unknown date';
                 
                 // Thumbnail HTML
                 const thumbnailHtml = diagram.thumbnail 
@@ -499,7 +508,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     e.stopPropagation();
                     if (confirm(`Are you sure you want to delete "${diagram.title}"?`)) {
                         try {
-                            await firebaseManager.deleteDiagram(diagram.id);
+                            await backendAPI.deleteDiagram(diagram.id);
                             item.remove();
                             showToast(`Deleted "${diagram.title}"`);
                             
