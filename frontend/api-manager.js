@@ -2,8 +2,9 @@
  * API Manager for Flask Backend
  * Replaces Firebase authentication and Firestore operations
  */
+import { ENV } from './env.js';
 
-const API_BASE_URL = 'https://working-mermaid-editor.createall.me/api';  // Change to your production URL
+const API_BASE_URL = ENV.API_BASE_URL;
 
 export class ApiManager {
     constructor(onAuthChange) {

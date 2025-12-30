@@ -1,11 +1,9 @@
 /**
  * Backend API client for authentication and diagram management
  */
+import { ENV } from './env.js';
 
-// Auto-detect API URL based on environment
-const API_BASE_URL = window.location.hostname === 'localhost'
-    ? 'https://working-mermaid-editor.createall.me/api'
-    : 'https://working-mermaid-editor.createall.me/api';  // TODO: Update with your production backend URL
+const API_BASE_URL = ENV.API_BASE_URL;
 
 export class BackendAPI {
     constructor() {

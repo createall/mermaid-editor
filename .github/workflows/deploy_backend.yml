@@ -23,7 +23,6 @@ jobs:
         REMOTE_USER: ${{ secrets.REMOTE_USER }}
         SOURCE: "backend/"
         TARGET: "/opt/mermaid-editor-backend/"
-        DELETE_REMOTE: true
     
     - name: Restart service
       uses: appleboy/ssh-action@master

@@ -15,9 +15,18 @@ Desktop.ini
 
 # Environment variables (SECURITY: Never commit these!)
 .env
-.env.local
-.env.*.local
-backend/.env
+.env.*
+!.env.example
+
+# Frontend environment (optional - can be committed safely)
+# Uncomment next line if you want to gitignore the active env.js
+# frontend/env.js
+
+# Environment variables (SECURITY: Never commit these!)
+env.js
+env.*.js
+!env.example.js
+
 
 # Logs
 *.log
