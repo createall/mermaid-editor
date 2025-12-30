@@ -1,0 +1,45 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to Server
+      uses: easingthemes/ssh-deploy@v4
+      with:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+        REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+        REMOTE_USER: ${{ secrets.REMOTE_USER }}
+        SOURCE: "backend/"
+        TARGET: "/opt/mermaid-editor-backend/"
+        DELETE_REMOTE: true
+    
+    - name: Restart service
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.REMOTE_PORT }}
+        script: |
+          cd /opt/mermaid-editor-backend/
+
+          /opt/mermaid-editor-backend/.venv/bin/pip install -r requirements.txt
+
+          # 서비스 재시작
+          sudo systemctl restart mermaid-editor-backend
+
+          # 상태 확인
+          sleep 2
+          sudo systemctl is-active mermaid-editor-backend
