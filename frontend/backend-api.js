@@ -19,7 +19,10 @@ export class BackendAPI {
      */
     getAuthHeaders() {
         const headers = {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
         };
         if (this.accessToken) {
             headers['Authorization'] = `Bearer ${this.accessToken}`;
@@ -53,8 +56,9 @@ export class BackendAPI {
      */
     async loginWithGoogle() {
         try {
-            // Redirect to backend OAuth endpoint
-            window.location.href = `${API_BASE_URL}/auth/google/url`;
+            // Redirect to backend OAuth endpoint with cache buster
+            const timestamp = new Date().getTime();
+            window.location.href = `${API_BASE_URL}/auth/google/url?_=${timestamp}`;
         } catch (error) {
             console.error('Login error:', error);
             throw error;

@@ -57,6 +57,16 @@ else:
     )
 
 
+# Add cache-control headers to all responses
+@app.after_request
+def add_cache_control_headers(response):
+    """Add cache control headers to prevent client-side caching."""
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+
 # Health check endpoint
 @app.route('/api/health', methods=['GET'])
 def health_check():

@@ -1,4 +1,4 @@
-import { CONFIG, getMermaidHints } from './config.js';
+import { CONFIG, getMermaidHints, SAMPLES } from './config.js';
 import { debounce, ensureDiagramVisible, showToast } from './utils.js';
 import { initializeMermaid, renderDiagram, applyDarkMode } from './diagram.js';
 import { BackendAPI } from './backend-api.js';
@@ -176,6 +176,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const loadModal = document.getElementById('load-modal');
     const closeLoadModalBtn = document.getElementById('close-load-modal');
     const diagramList = document.getElementById('diagram-list');
+
+    // Current diagram tracking
+    const currentDiagramBar = document.getElementById('current-diagram-bar');
+    const currentDiagramName = document.getElementById('current-diagram-name');
+    const createNewBtn = document.getElementById('create-new-btn');
+    const quickUpdateBtn = document.getElementById('quick-update-btn');
+    const quickDeleteBtn = document.getElementById('quick-delete-btn');
+    let currentDiagram = null; // { id, title }
 
     // Handle OAuth callback if present
     if (backendAPI.handleOAuthCallback()) {
@@ -377,7 +385,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const btn = e.target;
                     const diagramId = btn.dataset.id;
                     const diagramTitle = btn.dataset.title;
-                    
+
                     const code = editor.getValue();
                     const thumbnail = createThumbnail();
                     try {
@@ -385,6 +393,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                         btn.textContent = 'Updating...';
                         await backendAPI.updateDiagram(diagramId, { code, thumbnail });
                         saveModal.classList.remove('show');
+
+                        // Set as current diagram after update
+                        setCurrentDiagram(diagramId, diagramTitle);
                         showToast(`"${diagramTitle}" updated!`);
                     } catch (error) {
                         showToast('Failed to update: ' + error.message, true);
@@ -424,9 +435,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             confirmSaveBtn.disabled = true;
             confirmSaveBtn.textContent = 'Saving...';
-            await backendAPI.createDiagram(title, code, thumbnail);
+            const newDiagram = await backendAPI.createDiagram(title, code, thumbnail);
             saveModal.classList.remove('show');
             diagramTitleInput.value = '';
+
+            // Set as current diagram after creation
+            setCurrentDiagram(newDiagram.id, title);
             showToast('Diagram saved to cloud!');
         } catch (error) {
             showToast('Failed to save: ' + error.message, true);
@@ -491,6 +505,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 item.querySelector('.load-btn').addEventListener('click', () => {
                     editor.setValue(diagram.code);
                     loadModal.classList.remove('show');
+
+                    // Set as current diagram
+                    setCurrentDiagram(diagram.id, diagram.title);
                     showToast(`Loaded "${diagram.title}"`);
                 });
 
@@ -511,7 +528,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                             await backendAPI.deleteDiagram(diagram.id);
                             item.remove();
                             showToast(`Deleted "${diagram.title}"`);
-                            
+
+                            // Clear current diagram if it's the one being deleted
+                            if (currentDiagram && currentDiagram.id === diagram.id) {
+                                clearCurrentDiagram();
+                            }
+
                             // Check if list is empty
                             if (diagramList.children.length === 0) {
                                 diagramList.innerHTML = `
@@ -535,6 +557,92 @@ document.addEventListener('DOMContentLoaded', async () => {
             diagramList.innerHTML = `<div class="loading-spinner" style="color: red;">Error: ${error.message}</div>`;
         }
     }
+
+    // Set current diagram
+    function setCurrentDiagram(id, title) {
+        currentDiagram = { id, title };
+        currentDiagramName.textContent = title;
+        if (currentDiagramBar) {
+            currentDiagramBar.style.display = 'flex';
+        }
+    }
+
+    // Clear current diagram
+    function clearCurrentDiagram() {
+        currentDiagram = null;
+        if (currentDiagramBar) {
+            currentDiagramBar.style.display = 'none';
+        }
+    }
+
+    // Reset to empty/default diagram
+    function resetToDefaultDiagram() {
+        clearCurrentDiagram();
+        editor.setValue(SAMPLES.flowchart);
+        showToast('New diagram created');
+    }
+
+    // Create new button
+    createNewBtn.addEventListener('click', () => {
+        if (currentDiagram) {
+            if (confirm('Start a new diagram? Current diagram will be cleared.')) {
+                resetToDefaultDiagram();
+            }
+        } else {
+            resetToDefaultDiagram();
+        }
+    });
+
+    // Quick update button
+    quickUpdateBtn.addEventListener('click', async () => {
+        if (!currentDiagram) return;
+
+        const code = editor.getValue();
+        const thumbnail = createThumbnail();
+
+        try {
+            quickUpdateBtn.disabled = true;
+            quickUpdateBtn.textContent = 'Updating...';
+            await backendAPI.updateDiagram(currentDiagram.id, { code, thumbnail });
+            showToast(`"${currentDiagram.title}" updated!`);
+        } catch (error) {
+            showToast('Failed to update: ' + error.message, true);
+        } finally {
+            quickUpdateBtn.disabled = false;
+            quickUpdateBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                </svg>
+            `;
+        }
+    });
+
+    // Quick delete button
+    quickDeleteBtn.addEventListener('click', async () => {
+        if (!currentDiagram) return;
+
+        if (!confirm(`Are you sure you want to delete "${currentDiagram.title}"?`)) {
+            return;
+        }
+
+        try {
+            quickDeleteBtn.disabled = true;
+            quickDeleteBtn.textContent = 'Deleting...';
+            await backendAPI.deleteDiagram(currentDiagram.id);
+            showToast(`Deleted "${currentDiagram.title}"`);
+            resetToDefaultDiagram();
+        } catch (error) {
+            showToast('Failed to delete: ' + error.message, true);
+        } finally {
+            quickDeleteBtn.disabled = false;
+            quickDeleteBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                </svg>
+            `;
+        }
+    });
 
     function escapeHtml(text) {
         const div = document.createElement('div');
