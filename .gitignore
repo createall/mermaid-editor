@@ -11,6 +11,13 @@ Desktop.ini
 *.njsproj
 *.sln
 *.sw?
+.venv/
+
+# Environment variables (SECURITY: Never commit these!)
+.env
+.env.local
+.env.*.local
+backend/.env
 
 # Logs
 *.log
